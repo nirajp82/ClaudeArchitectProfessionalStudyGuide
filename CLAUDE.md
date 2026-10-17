@@ -20,6 +20,13 @@ The transcript and course text I paste are **reference only**. They tell you wha
    - Explain *why*, not only *what*. If the course says "auto-accept still asks before commands," also say why.
    - Break steps into numbered lists and options into bullets or tables.
    - Use a diagram when a process or flow is easier to see than to read.
+   - **Draw diagrams in Mermaid** (a ` ```mermaid ` code block), never as plain-text or box-drawing art. GitHub turns Mermaid into a real picture.
+     - A process or loop → `flowchart`
+     - Who sends what to whom, step by step → `sequenceDiagram`, with one column per player
+     - Where things live → `flowchart` with a `subgraph` for each place, such as "Your computer" and "Anthropic's servers"
+   - Keep ` ```text ` blocks only for literal content: folder trees, command output, the exact text of a message.
+   - When a lesson involves more than one player (you, Claude Code, your computer, the model, outside services), add a "Who's who" table first: where each one lives, what it does, and an example. Model: section 5 of `01_ClaudeCode101/02-how-claude-code-works.md`.
+   - Make examples concrete: real file names, real file contents with line numbers, the exact command, and the exact output. Show what goes where, not just "it searches" or "it sends the result."
 
 3. **Add examples where they help.**
    - Give a concrete example for each key idea, such as a sample prompt, a command, or a "for example, if a test fails..." case.

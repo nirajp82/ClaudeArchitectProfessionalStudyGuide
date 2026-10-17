@@ -78,22 +78,14 @@ The simplest version of an agent is a **large language model (LLM) running in a 
 
 The key part is step 3. The agent looks at what actually happened and uses it to decide what to do next. That's how it can recover when a test fails or a command errors.
 
-```text
-        ┌──────────────────────────────┐
-        │            Goal              │
-        └──────────────┬───────────────┘
-                       ▼
-   ┌──────────►  LLM decides next step
-   │                   │
-   │                   ▼
-   │       Act: read file / run command /
-   │       edit code / search web
-   │                   │
-   │                   ▼
-   └────────  Observe the result (output, errors)
-                       │
-                       ▼
-               Goal reached → done
+```mermaid
+flowchart TD
+    G["🎯 Goal<br/>e.g. fix this failing test"] --> D["🧠 Decide the next step"]
+    D --> A["🔧 Act<br/>read a file · run a command · edit code · search the web"]
+    A --> O["👀 Observe the result<br/>output, errors"]
+    O --> Q{"Goal reached?"}
+    Q -- "No: try again" --> D
+    Q -- "Yes" --> Done["✅ Done"]
 ```
 
 To take actions, an agent can use:

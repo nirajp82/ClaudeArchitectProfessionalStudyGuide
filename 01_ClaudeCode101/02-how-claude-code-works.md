@@ -227,80 +227,341 @@ This section puts the four parts together. It answers the question: **"When I ty
 > **Brain on the server. Hands on your computer.**
 > The model **asks**. Claude Code **does**. You **approve**.
 
-#### Two programs, two computers
+#### Who's who
 
-| | **Claude Code** (on your computer) | **The model** (on Anthropic's servers) |
-|---|---|---|
-| What it is | A program you installed | The AI brain |
-| Can see your files? | ✅ Yes | ❌ No. It only sees what Claude Code sends it. |
-| Can run commands? | ✅ Yes | ❌ No |
-| Remembers the conversation? | ✅ Yes. It keeps the full history. | ❌ No. It forgets everything after each reply. |
-| Its job | **Hands**: read, edit, run, and ask your permission | **Brain**: think and decide the next step |
+There are four players, plus one optional extra:
 
-They never share a screen or a disk. They only talk by **sending messages over the internet**.
+| Player | Where it lives | What it does | Example |
+|---|---|---|---|
+| 🧑 **You** (the human) | In front of your computer | Ask for things. Approve or reject actions. | Type "The login doesn't work." Click **Yes** to allow an edit. |
+| 💻 **Claude Code** (the hands) | **Your computer**, a program you installed | Carries messages between you and the model. Runs tools. Asks your permission. Keeps the conversation history. | Sends your request to the model. Opens `login.js` when the model asks for it. |
+| 🗂️ **Your files and terminal** | **Your computer** | Where the tools actually run: your disk, your project folder, your terminal. | `src/login.js` gets read and edited here. `npm test` runs here. |
+| ☁️ **The model** (the brain) | **Anthropic's servers**, over the internet | Reads what Claude Code sends. Decides the next step. **Can't touch your computer.** Forgets everything after each reply. | Decides "search for login," then "read login.js," then "fix line 10." |
+| 🔌 **Tool servers** (optional) | **Other computers**, run by other companies or your team | Extra tools you can connect, such as GitHub or a database. This is called **MCP**, covered in lesson 11. | "Create a GitHub issue." Not used in this example. |
 
-#### Example: "The login doesn't work"
+The model and your computer never share a screen or a disk. They only talk by **sending messages over the internet**, and Claude Code is the only one who talks to the model.
 
-Each round below is **one message from Claude Code to the server, and one reply back**.
+#### The map
 
-| Round | 💻 On your computer (Claude Code) | ☁️ On the server (the model) |
-|:---:|---|---|
-| **1** | You type *"The login doesn't work."* Claude Code sends your request, plus a list of the tools it has ("I can read files, search, edit, run commands…") and basic facts like which folder you're in. | Thinks: *"I don't know this code yet. Find the login code."* Replies with a tool call: 🔧 **Search for "login"** |
-| **2** | Searches **your disk**. Finds `src/login.js` and `tests/login.test.js`. Sends back **everything so far + the search result**. | Thinks: *"Look at the login code."* Replies: 🔧 **Read `src/login.js`** |
-| **3** | Opens the file **from your disk**. Sends back **everything so far + the file's contents**. | Reads the code. Spots the bug: line 12 compares the password to `user.email`. Replies: 🔧 **Edit line 12 to use `user.password`** |
-| **4** | Asks **you**: *"Allow edit to src/login.js?"* You click Yes. Changes the file **on your disk**. Sends back **everything so far + "edit done."** | Thinks: *"Now check it works."* Replies: 🔧 **Run `npm test`** |
-| **5** | Asks **you**: *"Allow command `npm test`?"* You click Yes. Runs the tests **on your computer**. Sends back **everything so far + "5 tests passed."** | Thinks: *"It works."* Replies with **plain text, no tool call**: 💬 *"Fixed. Line 12 was comparing the email instead of the password."* |
-| **End** | The reply has **no tool call**, so Claude Code knows the job is done. It shows you the message and waits. | Nothing. It has already forgotten all of this. |
-
-The same thing as a picture:
-
-```text
-  YOUR COMPUTER                                    ANTHROPIC'S SERVERS
-  Claude Code = the hands                          The model = the brain
-  -----------------------                          ---------------------
-
-  You: "The login doesn't work."
-     |
-     |-- (1) your request + tool list -------------->  "Find the login code."
-     |<------------------------------------------------ TOOL CALL: search "login"
-  searches your disk, finds src/login.js
-     |
-     |-- (2) everything so far + search result ----->  "Read that file."
-     |<------------------------------------------------ TOOL CALL: read src/login.js
-  opens the file from your disk
-     |
-     |-- (3) everything so far + file contents ----->  "Line 12 is wrong."
-     |<------------------------------------------------ TOOL CALL: edit line 12
-  asks YOU "Allow edit?" -> Yes
-  changes the file on your disk
-     |
-     |-- (4) everything so far + "edit done" ------->  "Now test it."
-     |<------------------------------------------------ TOOL CALL: run npm test
-  asks YOU "Allow command?" -> Yes
-  runs the tests on your computer
-     |
-     |-- (5) everything so far + "5 passed" -------->  "It works."
-     |<------------------------------------------------ TEXT: "Fixed. Line 12..."
-  no tool call -> loop ends
-  shows you the answer
+```mermaid
+flowchart LR
+    subgraph PC["💻 YOUR COMPUTER"]
+        H["🧑 You"]
+        CC["Claude Code<br/>(the hands)"]
+        T["🗂️ Your files and terminal<br/>Grep · Read · Edit · Bash"]
+    end
+    subgraph AN["☁️ ANTHROPIC'S SERVERS"]
+        M["The model<br/>(the brain)"]
+    end
+    subgraph EXT["🔌 TOOL SERVERS (optional)"]
+        X["MCP servers<br/>e.g. GitHub, a database"]
+    end
+    H -- "1 . asks / approves" --> CC
+    CC -- "2 . sends the whole conversation" --> M
+    M -- "3 . replies: tool call or text" --> CC
+    CC -- "4 . runs the tool" --> T
+    T -- "5 . result" --> CC
+    CC -- "asks permission, shows answer" --> H
+    CC -. "only if you set it up" .-> X
 ```
 
-#### What one message actually contains
+Read it like this: **you** talk only to **Claude Code**. **Claude Code** talks to the **model**, and also runs tools on **your files and terminal**. The **model** never reaches your files directly.
 
-Here is a simplified view of **message 3**. Notice that it repeats everything from rounds 1 and 2:
+#### The example project
+
+Say this is your project folder on your computer:
 
 ```text
-Message 3, sent from your computer to the server
-------------------------------------------------
-Instructions:  You are Claude Code. Tools you can use: Search, Read, Edit, Run...
-You:           The login doesn't work.
-Model:         [tool call] Search for "login"
-Claude Code:   [result]    src/login.js, tests/login.test.js
-Model:         [tool call] Read src/login.js
-Claude Code:   [result]    (all 40 lines of login.js)
+C:\projects\my-app\
+├── .env                    ← secret keys (ignored by Git)
+├── package.json
+├── node_modules\           ← thousands of library files (ignored by Git)
+├── src\
+│   ├── login.js            ← the bug is in here
+│   ├── crypto.js
+│   ├── users.js
+│   └── routes\
+│       └── auth.js
+└── tests\
+    └── login.test.js
 ```
 
-By message 5, it also contains the edit and the test output. This growing message **is the context window** from section 2. When it gets too big, Claude Code **compacts** it.
+And this is `src/login.js`. Look at **line 10**. It checks the password against the user's **email** instead of their **password hash** (the scrambled, safely stored version of the password). So every login fails.
+
+```js
+ 1  // src/login.js
+ 2  const users = require('./users');
+ 3  const { checkPassword } = require('./crypto');
+ 4
+ 5  function login(email, password) {
+ 6    const user = users.findByEmail(email);
+ 7    if (!user) {
+ 8      return { ok: false, error: 'No such user' };
+ 9    }
+10    if (!checkPassword(password, user.email)) {      // ❌ BUG: should be user.passwordHash
+11      return { ok: false, error: 'Wrong password' };
+12    }
+13    return { ok: true, user };
+14  }
+15
+16  module.exports = { login };
+```
+
+You open a terminal in `C:\projects\my-app`, start Claude Code, and type:
+
+> **You:** "The login doesn't work."
+
+Now follow each round. Every round has three parts:
+- **☁️ The model asks for:** the tool call the model sends to your computer
+- **💻 Claude Code does:** what actually happens on your computer
+- **📤 Sent to the server:** the exact text that goes back over the internet
+
+---
+
+#### Round 1: Claude Code sends the first message
+
+Before the model can do anything, Claude Code sends it a first message. **📤 Sent to the server:**
+
+```text
+1. Instructions    "You are Claude Code, a coding assistant..."  (written by Anthropic)
+
+2. Tool list       Grep  - search the text inside files
+                   Glob  - find files by name
+                   Read  - open a file
+                   Edit  - change part of a file
+                   Bash  - run a terminal command
+                   ...and a few more
+
+3. Your setup      Folder:  C:\projects\my-app
+                   System:  Windows
+                   Git:     on branch "main", no changed files
+                   Date:    today's date
+
+4. CLAUDE.md       Your project's instructions file, if you have one (lesson 8)
+
+5. Your message    "The login doesn't work."
+```
+
+**What is NOT in this message:** your code. Not a single file, and not even a list of your file names. The model starts out knowing nothing about your project except the folder name and the short Git summary.
+
+**☁️ The model thinks:** *"I don't know this code. Let me find where login is handled."* It replies with a tool call:
+
+```text
+TOOL CALL
+  tool:     Grep              (search the text inside files)
+  pattern:  "login"
+```
+
+---
+
+#### Round 2: Search
+
+**💻 Claude Code does:**
+1. Looks inside **every file** in `C:\projects\my-app` and all its subfolders for the word `login`.
+2. **Skips** files your `.gitignore` tells Git to ignore, such as `node_modules\` and `.env`.
+3. Finds the word in 3 files.
+
+All of this happens on **your** computer, using **your** disk. Nothing has been sent yet.
+
+**📤 Sent to the server:** everything from round 1, plus this result:
+
+```text
+RESULT of Grep "login"
+  src/login.js
+  src/routes/auth.js
+  tests/login.test.js
+```
+
+Only the **file names** are sent. The contents of those files are still only on your computer.
+
+**☁️ The model thinks:** *"`src/login.js` is the most likely place."* It replies:
+
+```text
+TOOL CALL
+  tool:       Read            (open a file)
+  file_path:  src/login.js
+```
+
+---
+
+#### Round 3: Read the file
+
+**💻 Claude Code does:** opens `src/login.js` from your disk and reads all 16 lines.
+
+**📤 Sent to the server:** everything from rounds 1–2, plus the **full contents** of the file:
+
+```text
+RESULT of Read src/login.js
+   1  // src/login.js
+   2  const users = require('./users');
+   3  const { checkPassword } = require('./crypto');
+   ...
+  10    if (!checkPassword(password, user.email)) {
+   ...
+  16  module.exports = { login };
+```
+
+This is the first time any of your **code** leaves your computer. Only this one file has gone. `users.js`, `crypto.js`, `auth.js`, and `.env` are still only on your computer.
+
+**☁️ The model thinks:** *"Line 10 checks the password against `user.email`. That's wrong. It should be `user.passwordHash`."* It replies:
+
+```text
+TOOL CALL
+  tool:        Edit           (change part of a file)
+  file_path:   src/login.js
+  old_string:  checkPassword(password, user.email)
+  new_string:  checkPassword(password, user.passwordHash)
+```
+
+Notice that the model doesn't send a whole new file. It sends **the exact text to find** and **the text to replace it with**.
+
+---
+
+#### Round 4: Edit the file
+
+**💻 Claude Code does:**
+1. **Asks you first:** *"Allow edit to src/login.js?"* and shows you the change. You click **Yes**.
+2. Finds `checkPassword(password, user.email)` in the file and replaces it with `checkPassword(password, user.passwordHash)`.
+3. Saves the file **on your disk**.
+
+If you had clicked **No**, the file would stay unchanged, and Claude Code would tell the model "the user said no."
+
+**📤 Sent to the server:** everything from rounds 1–3, plus:
+
+```text
+RESULT of Edit
+  The file src/login.js has been updated.
+```
+
+**☁️ The model thinks:** *"I changed it. Now I need to check it actually works."* It replies:
+
+```text
+TOOL CALL
+  tool:     Bash              (run a terminal command)
+  command:  npm test
+```
+
+---
+
+#### Round 5: Run the tests
+
+**💻 Claude Code does:**
+1. **Asks you first:** *"Allow command `npm test`?"* You click **Yes**.
+2. Runs `npm test` in your terminal, on **your** computer. Your processor runs the tests against your real files.
+3. Captures whatever the command prints.
+
+**📤 Sent to the server:** everything from rounds 1–4, plus the test output:
+
+```text
+RESULT of Bash "npm test"
+  PASS  tests/login.test.js
+    ✓ logs in with the correct password
+    ✓ rejects a wrong password
+    ✓ rejects an unknown email
+    ✓ returns the user on success
+    ✓ returns an error message on failure
+  Tests: 5 passed, 5 total
+```
+
+**☁️ The model thinks:** *"All 5 tests pass. The job is done."* This time it replies with **plain text and no tool call**:
+
+```text
+TEXT
+  Fixed. In src/login.js, line 10 was checking the password against
+  user.email instead of user.passwordHash. All 5 login tests now pass.
+```
+
+---
+
+#### The end
+
+**💻 Claude Code:** the reply has **no tool call**, so there's nothing left to do. Claude Code shows you the message and waits for your next request.
+
+**☁️ The model:** has already forgotten all of it. If you ask a follow-up, Claude Code sends the whole conversation again.
+
+---
+
+#### The whole conversation as a timeline
+
+Read top to bottom. Each column is one player. Each arrow is one thing being sent from one player to another.
+
+```mermaid
+sequenceDiagram
+    actor You as 🧑 You
+    participant CC as 💻 Claude Code
+    participant PC as 🗂️ Your files & terminal
+    participant M as ☁️ Model (Anthropic)
+
+    You->>CC: "The login doesn't work."
+
+    Note over CC,M: Round 1
+    CC->>M: instructions + tool list + your setup + your message (NO code)
+    M-->>CC: TOOL CALL: Grep "login"
+
+    Note over CC,M: Round 2: search
+    CC->>PC: search the text of every file in my-app
+    PC-->>CC: 3 file names
+    CC->>M: everything so far + 3 file names
+    M-->>CC: TOOL CALL: Read src/login.js
+
+    Note over CC,M: Round 3: read
+    CC->>PC: open src/login.js
+    PC-->>CC: 16 lines of code
+    CC->>M: everything so far + 16 lines of login.js
+    M-->>CC: TOOL CALL: Edit line 10
+
+    Note over You,M: Round 4: edit (needs your OK)
+    CC->>You: Allow edit to src/login.js?
+    You-->>CC: Yes
+    CC->>PC: replace the text on line 10
+    PC-->>CC: file updated
+    CC->>M: everything so far + "file updated"
+    M-->>CC: TOOL CALL: Bash "npm test"
+
+    Note over You,M: Round 5: test (needs your OK)
+    CC->>You: Allow command npm test?
+    You-->>CC: Yes
+    CC->>PC: run npm test
+    PC-->>CC: 5 passed
+    CC->>M: everything so far + test output
+    M-->>CC: TEXT: "Fixed. Line 10 ..."
+
+    Note over CC: No tool call, so the loop ends
+    CC->>You: Fixed. Line 10 was checking the wrong field.
+```
+
+Things to notice in the timeline:
+- **You** only ever talk to **Claude Code**: your request, and the two "Yes" clicks.
+- The **model** column only ever talks to **Claude Code**. It never has an arrow to your files.
+- Every arrow into **your files & terminal** comes from **Claude Code**. That's the only player that touches your computer.
+- The arrows to the **model** get bigger every round ("everything so far + ...").
+
+#### How the message grows each round
+
+The model forgets everything after each reply, so **every message repeats everything before it**:
+
+| Message | What's in it |
+|:---:|---|
+| **1** | Instructions + tool list + your setup + "The login doesn't work." |
+| **2** | All of message 1 + model's Grep request + **3 file names** |
+| **3** | All of message 2 + model's Read request + **16 lines of `login.js`** |
+| **4** | All of message 3 + model's Edit request + "file updated" |
+| **5** | All of message 4 + model's Bash request + **the test output** |
+
+This growing message **is the context window** from section 2. When it gets too big, Claude Code **compacts** it by summarizing the older parts.
+
+#### What went to the server, and what never left your computer
+
+| 📤 Sent to Anthropic's servers | 🔒 Never left your computer |
+|---|---|
+| Your message: "The login doesn't work." | `src/users.js`, `src/crypto.js`, `src/routes/auth.js` (only their names, never their contents) |
+| Folder path, system, Git summary | `tests/login.test.js` contents (only its name and the test results) |
+| 3 file names from the search | `.env` and its secret keys |
+| All 16 lines of `src/login.js` | `node_modules\` |
+| "file updated" | Everything else on your computer |
+| The `npm test` output | |
+
+> **Note:** The tool calls above are simplified so they're easy to read. Behind the scenes they're sent as structured data (JSON), but the information is the same. In a real session, Claude often reads a few more files (for example, `crypto.js` to see how `checkPassword` works) before making a change. Each extra file it reads is sent to the server the same way.
 
 #### Four facts that clear up the confusion
 
@@ -430,22 +691,28 @@ Actions that can't be undone (like deleting a database), that destroy things (li
 **Q14. Does the model see my whole codebase?**
 No. It only sees what Claude Code sends: your messages, plus the results of the tools it asked for, such as the files it read. Files that were never read stay on your computer.
 
-**Q15. The model forgets everything after each reply. So how does it follow a long task?**
+**Q15. What's in the very first message, before Claude has looked at anything?**
+Anthropic's instructions, the list of tools, your setup (folder path, system, a short Git summary, the date), your `CLAUDE.md` if you have one, and your request. **No code, and not even a list of your file names.**
+
+**Q16. When Claude searches for "login", what actually gets sent to the server?**
+Claude Code searches the text inside the files in your project folder **on your computer**, skipping anything your `.gitignore` ignores. Only the result goes to the server, which by default is the **names** of the matching files, such as `src/login.js`. The files' contents are sent only if the model then asks to **Read** a file.
+
+**Q17. The model forgets everything after each reply. So how does it follow a long task?**
 Claude Code sends the **whole conversation** with every message: your request, every tool call, every file read, every result. The model reads it all fresh each time. That growing message is the context window.
 
-**Q16. Isn't sending the whole conversation every time slow and wasteful?**
+**Q18. Isn't sending the whole conversation every time slow and wasteful?**
 Less than it sounds. Anthropic's servers can reuse the parts of a message they've already seen (this is called *prompt caching*), so repeating the history is faster and cheaper than processing it from scratch.
 
-**Q17. When Claude "runs the tests," where do they run?**
+**Q19. When Claude "runs the tests," where do they run?**
 On your computer. Claude Code runs the command using your files and your tools. The model only sends the instruction and reads the output that comes back.
 
-**Q18. How does Claude Code know the loop is finished?**
+**Q20. How does Claude Code know the loop is finished?**
 The model replies with plain text instead of a tool call. No tool call means there's nothing left to do.
 
-**Q19. Could the model delete my files directly?**
+**Q21. Could the model delete my files directly?**
 No. It can't touch your computer. It can only *ask* Claude Code, and Claude Code checks your permission mode before doing anything.
 
-**Q20. (Exam angle) How should a team choose a permission mode?**
+**Q22. (Exam angle) How should a team choose a permission mode?**
 Give Claude less freedom when mistakes would be costly:
 - **Plan mode** for big or risky changes, so a person approves the plan first.
 - **Manual** or **auto-accept** for everyday work, so a person still approves commands.
@@ -453,14 +720,14 @@ Give Claude less freedom when mistakes would be costly:
 
 Put the choice in the settings file so the whole team works the same way, instead of each person deciding. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q21. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
+**Q23. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
 Without the questions, a mistake happens before anyone can stop it. To reduce the risk:
 - Keep a person approving anything that can't be undone.
 - Use Plan mode to agree on the approach first.
 - Run Claude in a separate test environment, so a bad command can't harm real systems.
 - Use tests to catch mistakes after changes are made.
 
-**Q22. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
+**Q24. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
 - **What leaves:** the messages Claude Code sends to the model. That means the developer's requests, plus the results of any tools Claude used: the contents of files it read, command output, search results.
 - **What stays:** everything Claude never read or ran. The code runs, the files change, and commands execute on the developer's machine.
 - **How to control it:** limit what Claude can read and run with permission settings, keep secrets out of files Claude is likely to open, and set these rules centrally for the team.
