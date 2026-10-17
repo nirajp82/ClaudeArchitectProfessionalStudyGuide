@@ -29,23 +29,7 @@ The agentic loop is the cycle Claude Code repeats until your task is done.
    - If the results are good, Claude stops and waits for your next prompt.
    - If they aren't, Claude goes back to step 2 and tries again. It keeps going until the result is complete and can be checked.
 
-```text
-          Your prompt
-               │
-               ▼
-     ┌──► Gather context ──┐
-     │                     ▼
-     │               Take action
-     │                     │
-     │                     ▼
-     └─── not done ── Verify results
-                           │
-                         done
-                           ▼
-                Wait for next prompt
-
-   At any point, you can: add context · interrupt · steer
-```
+<img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/183c87f2-2032-4b41-8a72-6b43d8f70a3f" />
 
 **You can step in at any time.** While the loop runs, you can:
 - **Add context**: give it information it's missing, such as "the config file is in `/settings`."
@@ -102,6 +86,7 @@ More about each mode:
 Which mode a new session starts in depends on your Claude Code version and settings. All of this can be configured in your **settings file**.
 
 **Be careful when skipping permissions.** If Claude can run any command without asking, a mistake can happen before you get a chance to catch it. The more freedom you give it, the less chance you have to stop a bad action.
+![Uploading image.png…]()
 
 ### Recap
 
