@@ -563,6 +563,54 @@ This growing message **is the context window** from section 2. When it gets too 
 
 > **Note:** The tool calls above are simplified so they're easy to read. Behind the scenes they're sent as structured data (JSON), but the information is the same. In a real session, Claude often reads a few more files (for example, `crypto.js` to see how `checkPassword` works) before making a change. Each extra file it reads is sent to the server the same way.
 
+#### What about a big task that touches 50 files?
+
+> **Claude sends what it *reads*, not what it *touches*.**
+> Files it never opens stay on your computer. Files it opens, even 50 of them, do go to the server, often as just the parts it needs.
+
+**Example:** your project has **1,000 files**. You ask:
+
+> **You:** "Rename the function `calcTotal` to `calculateTotal` everywhere."
+
+`calcTotal` is used in **50 files**. Here's what happens:
+
+```mermaid
+flowchart TD
+    P["🗂️ Your project: 1,000 files"] --> S["🔎 Grep for calcTotal<br/>runs on YOUR computer"]
+    S --> N["950 files: no match<br/>🔒 never sent, not even their names"]
+    S --> F["50 files match"]
+    F --> R["📤 Sent: the matching lines, or the parts of<br/>each file Claude reads, one batch at a time"]
+    R --> E["📤 Sent back from the model: small edits only<br/>replace calcTotal with calculateTotal"]
+    E --> D["💻 Files changed on YOUR disk"]
+```
+
+| | Sent to the server? |
+|---|---|
+| The **950 files** with no match | ❌ Never. Not even their names. |
+| The **search result** | Only the **file names**, or just the **matching lines**, such as `src/cart.js:42: return calcTotal(items);` |
+| The **50 files** Claude reads so it can change them | ✅ Yes. **Whatever it reads** gets sent. That could be a whole file or just the section around each match. |
+| The **changes** | Only small snippets: "replace this text with that text." The whole file is **not** sent again. |
+
+**Four things that keep it smaller than "50 whole files at once":**
+
+1. **Claude often reads only part of a file.** A search can return just the matching lines. The Read tool can open only a section, such as lines 30–60 of a 2,000-line file. For a simple rename, the few lines around each match are often enough.
+2. **It reads as it goes, not all at once.** It doesn't upload 50 files in one bundle. It reads a few files, changes them, then moves on to the next few. You see each read happen in your session.
+3. **The context window has a limit.** 50 big files might not fit on the "whiteboard." When it fills up, Claude Code **compacts** it: older file contents become short summaries. Claude can re-read a file later if it needs it.
+   ⚠️ Compacting only changes what is sent **from then on**. A file that was already sent was still sent.
+4. **Helpers can do the reading separately.** For big jobs, Claude can hand parts of the work to a helper called a **subagent** (lesson 9). The helper reads files in its own separate session and reports back a short summary, so your main conversation stays small. But the helper is also a model on Anthropic's servers, so **what it reads is still sent**.
+
+**One more detail: files already read get re-sent every round.**
+The model forgets after every reply, so Claude Code resends the whole conversation each round. A file read in round 3 rides along again in rounds 4, 5, 6, and so on, until compacting removes it. The servers recognize content they've already seen (*prompt caching*), so this is faster and cheaper than it sounds. But the same content does travel more than once.
+
+**How to keep big tasks under control:**
+
+| Do this | Why it helps | Example |
+|---|---|---|
+| **Be specific** | Claude reads less when it knows where to look. | "Rename `calcTotal` in `src/cart/`" instead of "clean up the cart code." |
+| **Use Plan mode first** | Claude lists the files it plans to change before it changes anything. | "Plan the rename. Don't edit yet." |
+| **Keep secrets out of reach** | Searches skip files your `.gitignore` ignores, and permission settings can block reading sensitive files. | Keep API keys in `.env`, not in `config.js`. |
+| **Split huge jobs** | Smaller tasks mean smaller conversations, with less compacting and less lost detail. | Do `src/cart/` first, then `src/checkout/`. |
+
 #### Four facts that clear up the confusion
 
 **1. The model forgets everything after each reply.**
@@ -583,6 +631,7 @@ The model can **ask** for anything, even something dangerous. Claude Code decide
 | ❌ Wrong idea | ✅ What really happens |
 |---|---|
 | "The model reads my whole codebase." | It only sees the files it asked to read. |
+| "If a task touches 50 files, it uploads all 50 in one go." | It reads them a few at a time, often only the parts it needs. Whatever it reads is sent, but files it never opens aren't. |
 | "My tests run in the cloud." | They run on your computer. The model only sees the output. |
 | "The model remembers what we did." | It forgets after every reply. Claude Code resends the history each time. |
 | "The model could delete my files directly." | It can't touch your files. It can only ask Claude Code, and Claude Code checks your permissions first. |
@@ -614,6 +663,12 @@ The model forgets everything after each reply, so Claude Code resends the whole 
 <summary>4. Does the model see a file Claude never opened?</summary>
 
 No. Only what Claude Code sends gets to the server. Files that were never read stay on your computer.
+</details>
+
+<details>
+<summary>5. Your project has 1,000 files. A rename touches 50 of them. What gets sent?</summary>
+
+The search result (file names or matching lines), plus whatever Claude reads from the 50 files, often just the parts around each match. The edits go back as small "replace this with that" snippets. The other 950 files are never sent.
 </details>
 
 ---
@@ -712,7 +767,16 @@ The model replies with plain text instead of a tool call. No tool call means the
 **Q21. Could the model delete my files directly?**
 No. It can't touch your computer. It can only *ask* Claude Code, and Claude Code checks your permission mode before doing anything.
 
-**Q22. (Exam angle) How should a team choose a permission mode?**
+**Q22. If my task touches 50 files, does Claude send all 50 files to the server?**
+It sends **what it reads**, not what it touches. If it reads all 50 files, their contents are sent, often only the parts around each change, and a few files at a time rather than all at once. Files it never opens, and files with no search match, are never sent. Edits go back as small "replace this with that" snippets, not whole files.
+
+**Q23. If the context window gets compacted, is a file I already sent "unsent"?**
+No. Compacting only changes what goes in **later** messages. Anything already sent was sent.
+
+**Q24. Do subagents keep my files from being sent?**
+No. A subagent reads files in its own separate session, which keeps your **main** conversation small. But it's also a model on Anthropic's servers, so what it reads is still sent.
+
+**Q25. (Exam angle) How should a team choose a permission mode?**
 Give Claude less freedom when mistakes would be costly:
 - **Plan mode** for big or risky changes, so a person approves the plan first.
 - **Manual** or **auto-accept** for everyday work, so a person still approves commands.
@@ -720,16 +784,17 @@ Give Claude less freedom when mistakes would be costly:
 
 Put the choice in the settings file so the whole team works the same way, instead of each person deciding. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q23. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
+**Q26. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
 Without the questions, a mistake happens before anyone can stop it. To reduce the risk:
 - Keep a person approving anything that can't be undone.
 - Use Plan mode to agree on the approach first.
 - Run Claude in a separate test environment, so a bad command can't harm real systems.
 - Use tests to catch mistakes after changes are made.
 
-**Q24. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
+**Q27. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
 - **What leaves:** the messages Claude Code sends to the model. That means the developer's requests, plus the results of any tools Claude used: the contents of files it read, command output, search results.
 - **What stays:** everything Claude never read or ran. The code runs, the files change, and commands execute on the developer's machine.
+- **On big tasks:** the amount sent grows with how much Claude **reads**, not with the size of the project. A 1,000-file project where Claude reads 50 files sends those 50 (or parts of them), not 1,000.
 - **How to control it:** limit what Claude can read and run with permission settings, keep secrets out of files Claude is likely to open, and set these rules centrally for the team.
 
 This fits the **Governance, Safety & Risk** exam domain.
