@@ -27,6 +27,22 @@ Every lesson is one notes file directly in this folder, named `0X-lesson-name.md
 
 Files are created as each lesson is completed. Paste the transcript after each lesson to add its notes.
 
+## To-do
+
+- [ ] **Bring lessons 1 and 3 up to lesson 2's standard** (see `CLAUDE.md`). They're accurate but were written before the style rules. Each needs:
+  - an "In one sentence" opener, everyday comparisons, and one running example
+  - Mermaid diagrams where a flow helps
+  - concrete examples (exact commands and output), "Common mix-ups" and "Test yourself"
+  - an FAQ in lesson 2's style
+- [ ] **Missing images.** Paste these screenshots in chat to fill the `<!-- IMAGE: ... -->` markers:
+  - Lesson 2: permission prompt before a bash command → `images/02-permission-prompt.png`
+  - Lesson 3: terminal after install → `images/03-terminal-install.png`
+  - Lesson 3: login method selection → `images/03-login-method.png`
+  - Lesson 3: VS Code extension page → `images/03-vscode-extension.png`
+  - Lesson 3: JetBrains plugin page → `images/03-jetbrains-plugin.png`
+  - Lesson 3: Desktop "Code" view → `images/03-desktop-code-view.png`
+  - Lesson 3: claude.ai/code repo selection → `images/03-web-repo-selection.png`
+
 ## When you finish this course
 
 1. [ ] Take the **course quiz**. Record every missed or guessed question, and the correct reasoning, in `13-course-quiz-review.md`.
