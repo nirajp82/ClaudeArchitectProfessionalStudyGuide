@@ -1,8 +1,10 @@
 # Lesson 1 — What is Claude Code?
 
-> Course: [Claude Code 101](https://academy.claude.com/courses/claude-code-101) · Chapter 1: What is Claude Code?
-> Completed: October 17, 2026
-> ← [Course index](README.md) · Next: [How Claude Code works](02-how-claude-code-works.md) →
+**Course:** [Claude Code 101](https://academy.claude.com/courses/claude-code-101) &nbsp;·&nbsp; **Chapter 1:** What is Claude Code? &nbsp;·&nbsp; **Completed:** October 17, 2026
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| Start of course | [📚 Course index](README.md) | [How Claude Code works →](02-how-claude-code-works.md) |
 
 ---
 
@@ -191,3 +193,9 @@ Assume the agent's output might be wrong, and design ways to catch it:
 - **Small, bounded tasks**: small changes are easier to review and less risky when wrong.
 
 Never treat agent output as correct without checking it.
+
+---
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| Start of course | [📚 Course index](README.md) | [How Claude Code works →](02-how-claude-code-works.md) |

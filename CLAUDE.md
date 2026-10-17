@@ -52,8 +52,29 @@ The transcript and course text I paste are **reference only**. They tell you wha
 Follow `01_ClaudeCode101/02-how-claude-code-works.md`:
 
 1. Title: `# Lesson N — Lesson name`
-2. Header block: course link and chapter, completed date, and Previous / Course index / Next links
+2. Header: the info line, then the navigation table (exact format below), then `---`
 3. The lesson content, in sections
 4. `### Recap`
 5. `## My notes / practice`: a checklist of hands-on things to try
 6. `## FAQ`
+7. Footer: `---`, then the **same** navigation table as the header
+
+### Header and footer format
+
+Use exactly this. Don't use a `>` blockquote for the header: GitHub joins its lines into one messy paragraph.
+
+```markdown
+# Lesson 2 — How Claude Code works
+
+**Course:** [Claude Code 101](https://academy.claude.com/courses/claude-code-101) &nbsp;·&nbsp; **Chapter 1:** What is Claude Code? &nbsp;·&nbsp; **Completed:** October 17, 2026
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| [← What is Claude Code?](01-what-is-claude-code.md) | [📚 Course index](README.md) | [Installing Claude Code →](03-installing-claude-code.md) |
+
+---
+```
+
+- First lesson: put `Start of course` in the Previous cell.
+- Last item: put `End of course` in the Next cell.
+- When a new lesson is added, also check the previous lesson's Next link in both its header and footer.

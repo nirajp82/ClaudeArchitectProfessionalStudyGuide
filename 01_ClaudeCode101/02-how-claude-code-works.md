@@ -1,8 +1,10 @@
 # Lesson 2 — How Claude Code works
 
-> Course: [Claude Code 101](https://academy.claude.com/courses/claude-code-101) · Chapter 1: What is Claude Code?
-> Completed: October 17, 2026
-> ← Previous: [What is Claude Code?](01-what-is-claude-code.md) · [Course index](README.md) · Next: [Installing Claude Code](03-installing-claude-code.md) →
+**Course:** [Claude Code 101](https://academy.claude.com/courses/claude-code-101) &nbsp;·&nbsp; **Chapter 1:** What is Claude Code? &nbsp;·&nbsp; **Completed:** October 17, 2026
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| [← What is Claude Code?](01-what-is-claude-code.md) | [📚 Course index](README.md) | [Installing Claude Code →](03-installing-claude-code.md) |
 
 ---
 
@@ -273,3 +275,9 @@ Without the questions, a mistake happens before anyone can stop it. To reduce th
 - Use Plan mode to agree on the approach first.
 - Run Claude in a separate test environment, so a bad command can't harm real systems.
 - Use tests to catch mistakes after changes are made.
+
+---
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| [← What is Claude Code?](01-what-is-claude-code.md) | [📚 Course index](README.md) | [Installing Claude Code →](03-installing-claude-code.md) |

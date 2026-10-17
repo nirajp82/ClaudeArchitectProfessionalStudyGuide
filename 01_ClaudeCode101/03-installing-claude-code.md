@@ -1,8 +1,10 @@
 # Lesson 3 — Installing Claude Code
 
-> Course: [Claude Code 101](https://academy.claude.com/courses/claude-code-101) · Chapter 2: Your first prompt
-> Completed: October 17, 2026
-> ← Previous: [How Claude Code works](02-how-claude-code-works.md) · [Course index](README.md) · Next: [Your first prompt](04-your-first-prompt.md) →
+**Course:** [Claude Code 101](https://academy.claude.com/courses/claude-code-101) &nbsp;·&nbsp; **Chapter 2:** Your first prompt &nbsp;·&nbsp; **Completed:** October 17, 2026
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| [← How Claude Code works](02-how-claude-code-works.md) | [📚 Course index](README.md) | [Your first prompt →](04-your-first-prompt.md) |
 
 ---
 
@@ -234,3 +236,9 @@ The terminal. New features ship there first.
 
 **Q14. (Exam angle) Why does "it can access the folder you run it in" matter for security?**
 The starting folder sets how much Claude Code can reach. Starting it too high, such as in a home folder, could expose files that have nothing to do with the task, like private documents or credentials. Starting it in the project folder keeps it limited to what the task needs. This idea, giving only the access a task needs, is called *least privilege*.
+
+---
+
+| Previous | Course | Next |
+|:---|:---:|---:|
+| [← How Claude Code works](02-how-claude-code-works.md) | [📚 Course index](README.md) | [Your first prompt →](04-your-first-prompt.md) |
