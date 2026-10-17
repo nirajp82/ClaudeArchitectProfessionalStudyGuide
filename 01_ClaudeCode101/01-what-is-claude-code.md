@@ -8,6 +8,22 @@
 
 ---
 
+**On this page**
+
+| # | Section |
+|:---:|:---|
+| 1 | [Definition](#definition) |
+| 2 | [Where it's available](#where-its-available) |
+| 3 | [Claude Code vs. Claude.ai](#claude-code-vs-claudeai) |
+| 4 | [What is an AI agent?](#what-is-an-ai-agent) |
+| 5 | [What Claude Code can do (examples)](#what-claude-code-can-do-examples) |
+| 6 | [Three key concepts for using it well](#three-key-concepts-for-using-it-well) |
+| 7 | [Recap](#recap) |
+| 8 | [My notes / practice](#my-notes--practice) |
+| 9 | [FAQ](#faq) |
+
+---
+
 ### Definition
 
 Claude Code is an **agentic coding tool**. "Agentic" means it doesn't just answer questions. It takes actions on its own to finish a task you give it.

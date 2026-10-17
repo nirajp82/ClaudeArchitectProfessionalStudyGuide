@@ -8,6 +8,23 @@
 
 ---
 
+**On this page**
+
+| # | Section |
+|:---:|:---|
+| 1 | [The big picture](#the-big-picture) |
+| 2 | [1. Terminal](#1-terminal) |
+| 3 | [2. Visual Studio Code](#2-visual-studio-code) |
+| 4 | [3. JetBrains IDEs](#3-jetbrains-ides) |
+| 5 | [4. Claude Desktop](#4-claude-desktop) |
+| 6 | [5. Web](#5-web) |
+| 7 | [Which one should I use?](#which-one-should-i-use) |
+| 8 | [Recap](#recap) |
+| 9 | [My notes / practice](#my-notes--practice) |
+| 10 | [FAQ](#faq) |
+
+---
+
 ### The big picture
 
 You can use Claude Code in five places. It's the same Claude Code underneath. What changes is the window you use it through.

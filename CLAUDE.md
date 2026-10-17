@@ -53,11 +53,12 @@ Follow `01_ClaudeCode101/02-how-claude-code-works.md`:
 
 1. Title: `# Lesson N — Lesson name`
 2. Header: the info line, then the navigation table (exact format below), then `---`
-3. The lesson content, in sections
-4. `### Recap`
-5. `## My notes / practice`: a checklist of hands-on things to try
-6. `## FAQ`
-7. Footer: `---`, then the **same** navigation table as the header
+3. "On this page" table (format below), then `---`
+4. The lesson content, in sections
+5. `### Recap`
+6. `## My notes / practice`: a checklist of hands-on things to try
+7. `## FAQ`
+8. Footer: `---`, then the **same** navigation table as the header
 
 ### Header and footer format
 
@@ -78,3 +79,25 @@ Use exactly this. Don't use a `>` blockquote for the header: GitHub joins its li
 - First lesson: put `Start of course` in the Previous cell.
 - Last item: put `End of course` in the Next cell.
 - When a new lesson is added, also check the previous lesson's Next link in both its header and footer.
+
+### "On this page" table
+
+Right after the header, add a table that jumps to each section of the page:
+
+```markdown
+**On this page**
+
+| # | Section |
+|:---:|:---|
+| 1 | [In one sentence](#in-one-sentence) |
+| 2 | [1. The loop: look, do, check, repeat](#1-the-loop-look-do-check-repeat) |
+| 3 | [My notes / practice](#my-notes--practice) |
+| 4 | [FAQ](#faq) |
+
+---
+```
+
+- List every `##` and `###` heading in page order, including Recap, My notes / practice, and FAQ. Skip `####` subheadings.
+- Use bold text for "On this page", not a heading, so the table doesn't list itself.
+- Build each link the way GitHub does: lowercase, delete punctuation except hyphens, and turn each space into `-`. For example, `Where it's available` becomes `#where-its-available`, and `My notes / practice` becomes `#my-notes--practice`.
+- If you rename, add, or remove a heading, update the table.
