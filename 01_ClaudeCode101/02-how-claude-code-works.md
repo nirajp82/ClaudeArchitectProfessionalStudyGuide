@@ -307,10 +307,14 @@ And this is `src/login.js`. Look at **line 10**. It checks the password against 
 16  module.exports = { login };
 ```
 
-Now follow the example step by step. There's one setup step, then five rounds. Each round has three parts:
-- **💻 Claude Code does:** what actually happens on your computer
+Now follow the example step by step. There's one setup step, then five rounds.
+
+**Which "Claude Code"?** In this walkthrough, **Claude Code** always means the **CLI**: the program you installed and run by typing `claude` in your terminal. It runs **on your computer**. The **model** is the separate AI on **Anthropic's servers**. The CLI and the model only talk by sending messages over the internet.
+
+Each round has three parts:
+- **💻 Claude Code CLI (on your computer) does:** what actually happens on your computer
 - **📤 Sent to the server:** the exact text that goes over the internet to the model
-- **☁️ The model thinks:** what the model decides, and the reply it sends back
+- **☁️ The model (on Anthropic's server) thinks:** what the model decides, and the reply it sends back
 
 ---
 
@@ -322,14 +326,57 @@ But Claude Code already knows something important: the model on Anthropic's serv
 
 **Everyday comparison:** it's like the cover sheet a front desk staples to every job ticket before passing it to a repair expert. The cover sheet says what the expert's job is, which tools are in the van, and the customer's address. The customer only writes the problem at the bottom.
 
-**💻 Claude Code does:** builds the starter pack from four sources:
+| In the comparison | In Claude Code | Where it is |
+|---|---|---|
+| The customer | 🧑 You | At your computer |
+| The front desk that prepares the cover sheet | 💻 The Claude Code **CLI** | **Your computer** |
+| The repair expert who reads it | ☁️ The model | **Anthropic's servers** |
 
-| Piece | What it tells the model | Where Claude Code gets it | Can you open it? |
-|---|---|---|---|
-| **Instructions** | "You are Claude Code. Help with coding. Ask before risky actions…" | Written by Anthropic, **built into the Claude Code program** (`claude.exe`) | No. It's inside the program, not a file. |
-| **Tool list** | "Here are the tools you can ask for, and what each one does." | Also built into Claude Code (plus any MCP tools you added) | No. You can ask Claude "What tools do you have?" |
-| **Facts about this computer** | Which folder, which operating system, the Git status, today's date | Claude Code **checks your computer** when it starts | You already know these facts. |
-| **Your project rules** | Anything you wrote in `CLAUDE.md` (lesson 8) | **Copied from the file** `C:\projects\my-app\CLAUDE.md`, if it exists | Yes. It's a normal text file. |
+So the starter pack is **built on your computer** by the CLI. The server only receives it.
+
+**💻 Claude Code CLI (on your computer) does:** builds the starter pack from four pieces. All four are on your computer, but they don't all come from the same place:
+- **Two pieces are installed with the CLI.** They're built into the program, so they're the same in every project.
+- **Two pieces are collected when you start `claude`.** The CLI looks at where you are right now, so they change from project to project.
+
+| Piece | What it tells the model | Installed or collected? | Where the CLI gets it | Can you open it? |
+|---|---|---|---|---|
+| **Instructions** | "You are Claude Code. Help with coding. Ask before risky actions…" | 📦 **Installed** | Written by Anthropic, **built into the program** (`claude.exe`). Changes only when Claude Code updates. | No. It's inside the program, not a file. |
+| **Tool list** | "Here are the tools you can ask for, and what each one does." | 📦 **Installed** (the built-in tools) | Built into the program. MCP tools you add come from your settings. | No. You can ask Claude "What tools do you have?" |
+| **Facts about this computer** | Which folder, which operating system, the Git status, today's date | 🔍 **Collected at startup** | The CLI **checks your computer** when you start `claude` | You already know these facts. |
+| **Your project rules** | Anything you wrote in `CLAUDE.md` (lesson 8) | 🔍 **Collected at startup** | **Read from the file** `CLAUDE.md` in the folder you started in, if it exists | Yes. It's a normal text file. |
+
+```mermaid
+flowchart LR
+    subgraph PC["💻 YOUR COMPUTER"]
+        subgraph INST["📦 Installed with the CLI (claude.exe)"]
+            I["Instructions"]
+            T["Tool list"]
+        end
+        subgraph NOW["🔍 Collected when you start claude"]
+            F["Facts about this computer<br/>folder · system · Git · date"]
+            R["CLAUDE.md<br/>from your project folder"]
+        end
+        SP["📋 Starter pack"]
+    end
+    I --> SP
+    T --> SP
+    F --> SP
+    R --> SP
+    SP -- "top of every message" --> M["☁️ The model<br/>Anthropic's servers"]
+```
+
+**The starter pack is not one saved file.** There's no `starter-pack.txt` anywhere on your computer. The CLI puts it together each time you start a session.
+
+**Example: same CLI, two projects.**
+
+| | Start `claude` in `C:\projects\my-app` | Start `claude` in `C:\projects\shop-site` |
+|---|---|---|
+| 📦 Instructions | Same | Same |
+| 📦 Tool list | Same | Same |
+| 🔍 Facts | Folder `my-app`, branch `main` | Folder `shop-site`, branch `checkout-fix` |
+| 🔍 Project rules | `my-app`'s `CLAUDE.md`: "Use JavaScript…" | `shop-site`'s `CLAUDE.md`: "Use TypeScript…" |
+
+So the model gets the **same job description** in both projects, but **different facts and rules**.
 
 This is roughly what the starter pack looks like. It's shortened and in plain English. The real one is much longer.
 
@@ -373,7 +420,7 @@ You type:
 
 > **You:** "The login doesn't work."
 
-**💻 Claude Code does:** adds your words to the **bottom** of the starter pack, then sends the whole thing to Anthropic's servers as one message.
+**💻 Claude Code CLI (on your computer) does:** adds your words to the **bottom** of the starter pack, then sends the whole thing to Anthropic's servers as one message.
 
 ```mermaid
 flowchart LR
@@ -395,7 +442,7 @@ flowchart LR
 The login doesn't work.
 ```
 
-**☁️ The model thinks:** *"I don't know this code yet. Let me find where login is handled."* It picks a tool from the tool list and replies with a tool call:
+**☁️ The model (on Anthropic's server) thinks:** *"I don't know this code yet. Let me find where login is handled."* It picks a tool from the tool list and replies with a tool call:
 
 ```text
 TOOL CALL
@@ -407,7 +454,7 @@ TOOL CALL
 
 #### Round 2: Search
 
-**💻 Claude Code does:**
+**💻 Claude Code CLI (on your computer) does:**
 1. Looks inside **every file** in `C:\projects\my-app` and all its subfolders for the word `login`.
 2. **Skips** files your `.gitignore` tells Git to ignore, such as `node_modules\` and `.env`.
 3. Finds the word in 3 files.
@@ -425,7 +472,7 @@ RESULT of Grep "login"
 
 Only the **file names** are sent. The contents of those files are still only on your computer.
 
-**☁️ The model thinks:** *"`src/login.js` is the most likely place."* It replies:
+**☁️ The model (on Anthropic's server) thinks:** *"`src/login.js` is the most likely place."* It replies:
 
 ```text
 TOOL CALL
@@ -437,7 +484,7 @@ TOOL CALL
 
 #### Round 3: Read the file
 
-**💻 Claude Code does:** opens `src/login.js` from your disk and reads all 16 lines.
+**💻 Claude Code CLI (on your computer) does:** opens `src/login.js` from your disk and reads all 16 lines.
 
 **📤 Sent to the server:** everything from rounds 1–2, plus the **full contents** of the file:
 
@@ -454,7 +501,7 @@ RESULT of Read src/login.js
 
 This is the first time any of your **code** leaves your computer. Only this one file has gone. `users.js`, `crypto.js`, `auth.js`, and `.env` are still only on your computer.
 
-**☁️ The model thinks:** *"Line 10 checks the password against `user.email`. That's wrong. It should be `user.passwordHash`."* It replies:
+**☁️ The model (on Anthropic's server) thinks:** *"Line 10 checks the password against `user.email`. That's wrong. It should be `user.passwordHash`."* It replies:
 
 ```text
 TOOL CALL
@@ -470,7 +517,7 @@ Notice that the model doesn't send a whole new file. It sends **the exact text t
 
 #### Round 4: Edit the file
 
-**💻 Claude Code does:**
+**💻 Claude Code CLI (on your computer) does:**
 1. **Asks you first:** *"Allow edit to src/login.js?"* and shows you the change. You click **Yes**.
 2. Finds `checkPassword(password, user.email)` in the file and replaces it with `checkPassword(password, user.passwordHash)`.
 3. Saves the file **on your disk**.
@@ -484,7 +531,7 @@ RESULT of Edit
   The file src/login.js has been updated.
 ```
 
-**☁️ The model thinks:** *"I changed it. Now I need to check it actually works."* It replies:
+**☁️ The model (on Anthropic's server) thinks:** *"I changed it. Now I need to check it actually works."* It replies:
 
 ```text
 TOOL CALL
@@ -496,7 +543,7 @@ TOOL CALL
 
 #### Round 5: Run the tests
 
-**💻 Claude Code does:**
+**💻 Claude Code CLI (on your computer) does:**
 1. **Asks you first:** *"Allow command `npm test`?"* You click **Yes**.
 2. Runs `npm test` in your terminal, on **your** computer. Your processor runs the tests against your real files.
 3. Captures whatever the command prints.
@@ -514,7 +561,7 @@ RESULT of Bash "npm test"
   Tests: 5 passed, 5 total
 ```
 
-**☁️ The model thinks:** *"All 5 tests pass. The job is done."* This time it replies with **plain text and no tool call**:
+**☁️ The model (on Anthropic's server) thinks:** *"All 5 tests pass. The job is done."* This time it replies with **plain text and no tool call**:
 
 ```text
 TEXT
@@ -683,6 +730,7 @@ The model can **ask** for anything, even something dangerous. Claude Code decide
 | ❌ Wrong idea | ✅ What really happens |
 |---|---|
 | "The model only gets the words I type." | Claude Code puts a starter pack on top of every message: Anthropic's instructions, the tool list, facts about your computer, and your `CLAUDE.md`. |
+| "The whole starter pack is installed with the CLI." | Only the instructions and tool list are installed. The computer facts and `CLAUDE.md` are collected each time you start `claude`, from the folder you're in. |
 | "Anthropic's instructions are a file in my project I can open." | They're built into the Claude Code program. The part you can see and edit is `CLAUDE.md`. |
 | "The model reads my whole codebase." | It only sees the files it asked to read. |
 | "If a task touches 50 files, it uploads all 50 in one go." | It reads them a few at a time, often only the parts it needs. Whatever it reads is sent, but files it never opens aren't. |
@@ -803,10 +851,13 @@ Actions that can't be undone (like deleting a database), that destroy things (li
 - **Your computer:** Claude Code, the hands. It searches, reads, and edits files, runs commands, asks your permission, and keeps the conversation history.
 - **Anthropic's servers:** the model, the brain. It reads the messages Claude Code sends and decides the next step.
 
-**Q14. Does the model see my whole codebase?**
+**Q14. When these notes say "Claude Code does…", is that the CLI on my computer or something on the server?**
+The **CLI on your computer**: the program you start by typing `claude`. Everything labelled "Claude Code does" happens there: building the starter pack, searching, reading and editing files, running commands, and asking your permission. The only thing on Anthropic's servers is the **model**, which reads the messages and decides the next step.
+
+**Q15. Does the model see my whole codebase?**
 No. It only sees what Claude Code sends: your messages, plus the results of the tools it asked for, such as the files it read. Files that were never read stay on your computer.
 
-**Q15. What's in the very first message, before Claude has looked at anything?**
+**Q16. What's in the very first message, before Claude has looked at anything?**
 Your request, with a **starter pack** on top. Claude Code builds the starter pack when it starts, before you type anything:
 - **Instructions** written by Anthropic (the *system prompt*): "You are Claude Code, help with coding, ask before risky actions…"
 - **Tool list:** Grep, Glob, Read, Edit, Bash, and what each one does.
@@ -815,39 +866,46 @@ Your request, with a **starter pack** on top. Claude Code builds the starter pac
 
 **No code, and not even a list of your file names.** You only type the request. Claude Code adds the starter pack automatically, and sends it again at the top of every message.
 
-**Q16. Where are Anthropic's instructions (the system prompt) on my computer? Can I read them?**
+**Q17. Where are Anthropic's instructions (the system prompt) on my computer? Can I read them?**
 They're built into the Claude Code program itself (on Windows, usually `C:\Users\<you>\.local\bin\claude.exe`). They aren't a separate file, so you can't open and read them. What you can do:
 - Run `/context` to see how much space they take up.
 - Add your own instructions on top with `CLAUDE.md` (a normal file you can open and edit) or `claude --append-system-prompt "..."`.
 
-**Q17. When Claude searches for "login", what actually gets sent to the server?**
+**Q18. Is the starter pack installed with the Claude Code CLI?**
+Only half of it. The CLI builds the starter pack each time you start `claude`:
+- **Installed with the CLI:** Anthropic's instructions and the built-in tool list. They're the same in every project.
+- **Collected at startup:** facts about your computer (folder, system, Git, date) and your project's `CLAUDE.md`. They change depending on which folder you start in.
+
+There's no single starter-pack file. Start `claude` in two different projects, and the model gets the same instructions but different facts and rules.
+
+**Q19. When Claude searches for "login", what actually gets sent to the server?**
 Claude Code searches the text inside the files in your project folder **on your computer**, skipping anything your `.gitignore` ignores. Only the result goes to the server, which by default is the **names** of the matching files, such as `src/login.js`. The files' contents are sent only if the model then asks to **Read** a file.
 
-**Q18. The model forgets everything after each reply. So how does it follow a long task?**
+**Q20. The model forgets everything after each reply. So how does it follow a long task?**
 Claude Code sends the **whole conversation** with every message: your request, every tool call, every file read, every result. The model reads it all fresh each time. That growing message is the context window.
 
-**Q19. Isn't sending the whole conversation every time slow and wasteful?**
+**Q21. Isn't sending the whole conversation every time slow and wasteful?**
 Less than it sounds. Anthropic's servers can reuse the parts of a message they've already seen (this is called *prompt caching*), so repeating the history is faster and cheaper than processing it from scratch.
 
-**Q20. When Claude "runs the tests," where do they run?**
+**Q22. When Claude "runs the tests," where do they run?**
 On your computer. Claude Code runs the command using your files and your tools. The model only sends the instruction and reads the output that comes back.
 
-**Q21. How does Claude Code know the loop is finished?**
+**Q23. How does Claude Code know the loop is finished?**
 The model replies with plain text instead of a tool call. No tool call means there's nothing left to do.
 
-**Q22. Could the model delete my files directly?**
+**Q24. Could the model delete my files directly?**
 No. It can't touch your computer. It can only *ask* Claude Code, and Claude Code checks your permission mode before doing anything.
 
-**Q23. If my task touches 50 files, does Claude send all 50 files to the server?**
+**Q25. If my task touches 50 files, does Claude send all 50 files to the server?**
 It sends **what it reads**, not what it touches. If it reads all 50 files, their contents are sent, often only the parts around each change, and a few files at a time rather than all at once. Files it never opens, and files with no search match, are never sent. Edits go back as small "replace this with that" snippets, not whole files.
 
-**Q24. If the context window gets compacted, is a file I already sent "unsent"?**
+**Q26. If the context window gets compacted, is a file I already sent "unsent"?**
 No. Compacting only changes what goes in **later** messages. Anything already sent was sent.
 
-**Q25. Do subagents keep my files from being sent?**
+**Q27. Do subagents keep my files from being sent?**
 No. A subagent reads files in its own separate session, which keeps your **main** conversation small. But it's also a model on Anthropic's servers, so what it reads is still sent.
 
-**Q26. (Exam angle) How should a team choose a permission mode?**
+**Q28. (Exam angle) How should a team choose a permission mode?**
 Give Claude less freedom when mistakes would be costly:
 - **Plan mode** for big or risky changes, so a person approves the plan first.
 - **Manual** or **auto-accept** for everyday work, so a person still approves commands.
@@ -855,14 +913,14 @@ Give Claude less freedom when mistakes would be costly:
 
 Put the choice in the settings file so the whole team works the same way, instead of each person deciding. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q27. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
+**Q29. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
 Without the questions, a mistake happens before anyone can stop it. To reduce the risk:
 - Keep a person approving anything that can't be undone.
 - Use Plan mode to agree on the approach first.
 - Run Claude in a separate test environment, so a bad command can't harm real systems.
 - Use tests to catch mistakes after changes are made.
 
-**Q28. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
+**Q30. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
 - **What leaves:** the messages Claude Code sends to the model. That means the developer's requests, plus the results of any tools Claude used: the contents of files it read, command output, search results.
 - **What stays:** everything Claude never read or ran. The code runs, the files change, and commands execute on the developer's machine.
 - **On big tasks:** the amount sent grows with how much Claude **reads**, not with the size of the project. A 1,000-file project where Claude reads 50 files sends those 50 (or parts of them), not 1,000.
