@@ -12,7 +12,7 @@ Every lesson is one notes file directly in this folder, named `0X-lesson-name.md
 |---|---|---|---|---|
 | 1 | What is Claude Code? | What is Claude Code? | [01-what-is-claude-code.md](01-what-is-claude-code.md) | ✅ Done |
 | 2 | What is Claude Code? | How Claude Code works | [02-how-claude-code-works.md](02-how-claude-code-works.md) | ✅ Done |
-| 3 | Your first prompt | Installing Claude Code | `03-installing-claude-code.md` | ⬜ |
+| 3 | Your first prompt | Installing Claude Code | [03-installing-claude-code.md](03-installing-claude-code.md) | ✅ Done |
 | 4 | Your first prompt | Your first prompt | `04-your-first-prompt.md` | ⬜ |
 | 5 | Daily workflows | The explore → plan → code → commit workflow | `05-explore-plan-code-commit.md` | ⬜ |
 | 6 | Daily workflows | Context management | `06-context-management.md` | ⬜ |
@@ -42,6 +42,7 @@ See the full order in the [course sequence](../ClaudeArchitectProfessionalStudyG
 ```text
 01_ClaudeCode101/
 ├── README.md                        ← this index
+├── images/                          ← screenshots used in the lessons
 ├── 01-what-is-claude-code.md
 ├── 02-how-claude-code-works.md
 ├── 03-installing-claude-code.md
