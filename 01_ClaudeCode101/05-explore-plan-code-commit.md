@@ -155,7 +155,7 @@ The course says the fastest way to do steps 1 and 2 is **plan mode** (lesson 4).
 
 ![Claude Code status bar showing "plan mode on (shift+tab to cycle)" under the text input](images/05-plan-mode-status-bar.png)
 
-<!-- IMAGE: status bar showing "plan mode on (shift+tab to cycle) · esc to interrupt · ← 1 agent" → images/05-plan-mode-one-agent.png -->
+![Claude Code status bar showing "plan mode on (shift+tab to cycle) · esc to interrupt · ← 1 agent"](images/05-plan-mode-one-agent.png)
 
 **What does "← 1 agent" mean in the status bar?** While you're in plan mode, Claude Code may hand the reading to a built-in helper called the **Plan subagent**. "1 agent" means one helper is working right now. The helper reads the files in its own separate conversation and sends back what it found, so all that reading doesn't fill up your main conversation. You don't need to start it yourself. (More on subagents below and in lesson 9.)
 
@@ -222,21 +222,54 @@ The course's single prompt ("Figure out where… whether we need new dependencie
 | **Good for** | Code you know, smaller tasks | Code that's new to you, bigger tasks |
 | **Upside** | Faster | You check Claude Code understood the code **before** it plans. A wrong understanding leads to a wrong plan. |
 
-#### Explore and plan as a flow
+#### All four steps as a flow: what you press and type
+
+This diagram follows the WebP example from start to finish. It shows what you do (🧑) and what Claude Code does (💻) at each step.
 
 ```mermaid
 flowchart TD
-    S["🧑 Shift+Tab →<br/>⏸ plan mode on"] --> EP["🧑 Explore prompt<br/>'Read src/upload/ and explain…'"]
-    EP --> R["💻 Claude Code reads files<br/>(maybe via a helper: ← 1 agent)<br/>no edits possible"]
-    R --> EX["💻 Explanation of how<br/>the code works today"]
-    EX --> Q{"🧑 Understood<br/>correctly?"}
-    Q -- "no: ask a follow-up" --> EP
-    Q -- "yes" --> PP["🧑 Plan prompt<br/>'Create a plan, with Done when…'"]
-    PP --> PL["💻 Plan + options"]
-    PL --> A{"🧑 Plan looks right?"}
-    A -- "no: keep planning" --> PL
-    A -- "yes: approve" --> C["Plan mode turns off →<br/>step 3: Code"]
+    subgraph EXPLORE["1. Explore (plan mode)"]
+        S["🧑 Shift+Tab →<br/>⏸ plan mode on"] --> EP["🧑 Explore prompt<br/>'Read src/upload/ and explain…'"]
+        EP --> R["💻 Claude Code reads files<br/>(maybe via a helper: ← 1 agent)<br/>no edits possible"]
+        R --> EX["💻 Explanation of how<br/>the code works today"]
+        EX --> Q{"🧑 Understood<br/>correctly?"}
+        Q -- "no: ask a follow-up" --> EP
+    end
+
+    subgraph PLAN["2. Plan (still plan mode)"]
+        PP["🧑 Plan prompt<br/>'Create a plan, with Done when…'"] --> PL["💻 Plan + options"]
+        PL --> A{"🧑 Plan looks right?"}
+        A -- "no: keep planning,<br/>type the change" --> PL
+    end
+
+    subgraph CODE["3. Code (plan mode off)"]
+        Y["🧑 Pick a 'Yes…' option<br/>(e.g. auto-accept edits)"] --> ED["💻 Edits resize.js,<br/>storage.js, tests"]
+        ED --> T["💻 Runs npm test"]
+        T --> TP{"Tests pass?"}
+        TP -- "no: Claude Code<br/>fixes it" --> ED
+        TP -- "yes" --> DONE["💻 'Done: all tests pass'"]
+        DONE --> YOU{"🧑 Try it yourself:<br/>works?"}
+        YOU -- "no: Esc, then<br/>'Photos are sideways'" --> ED
+    end
+
+    subgraph COMMIT["4. Commit"]
+        CR["🧑 /code-review"] --> RV["💻 Reviewer subagent<br/>reports issues"]
+        RV --> FX["🧑 'Fix issue 1'"]
+        FX --> CM["🧑 'Commit in the style<br/>of our recent commits'"]
+        CM --> GC["💻 git commit<br/>(then push)"]
+    end
+
+    Q -- "yes" --> PP
+    A -- "yes: approve" --> Y
+    YOU -- "yes" --> CR
+    GC -- "next feature:<br/>back to Shift+Tab" --> S
 ```
+
+Things to notice:
+- **Each box with 🧑 is something you press or type.** Everything else is Claude Code working.
+- **Each step has its own "no" loop.** Explore: ask a follow-up. Plan: change the plan. Code: Claude Code fixes failing tests itself, and you step in with Esc if the app looks wrong.
+- **Plan mode is on only for steps 1 and 2.** Picking "Yes…" is what turns it off.
+- **The commit happens only after you've tried the change and the review is done.**
 
 #### What the plan looks like
 
