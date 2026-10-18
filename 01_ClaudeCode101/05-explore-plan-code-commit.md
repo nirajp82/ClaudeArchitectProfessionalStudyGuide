@@ -41,6 +41,22 @@ The course says: *"If you take one thing away from Claude Code, let it be this w
 
 **Commit** means saving a snapshot of your changes in **Git**, the tool that keeps the history of your code. Each commit has a short message saying what changed.
 
+#### How to do each step: the cheat sheet
+
+None of the four steps is a button or a command. **Each step is a prompt you type**, sent in the right **mode**. The mode is shown in the status bar under the text box. You change it with **Shift+Tab**.
+
+| Step | Mode (status bar) | What you press | What you type (WebP example) | What you get back |
+|---|---|---|---|---|
+| **1. Explore** | `⏸ plan mode on` | **Shift+Tab** until plan mode is on | "Read src/upload/ and package.json. Explain how an uploaded image flows through the pipeline. Don't plan anything yet." | An explanation of how the code works today. No files changed. |
+| **2. Plan** | `⏸ plan mode on` (still) | Nothing, stay in plan mode | "Now I want to convert uploads to WebP. Where should it happen? Do we need new dependencies? Create a plan, with a 'Done when' list." | A plan, then a list of options: approve, or type a change |
+| **3. Code** | Changes when you approve, e.g. `⏵⏵ accept edits on` | Pick a **"Yes…"** option on the plan | Nothing more, or "Implement the plan. Run `npm test` and fix any failures." | Edits, test runs, fixes. You step in if something looks wrong. |
+| **4. Commit** | Any mode except plan | Nothing | First test it yourself. Then: "Run /code-review on my changes." Then: "Commit these changes with a message in the same style as our recent commits." | A review, then a Git commit |
+
+Things to notice:
+- **Steps 1 and 2 both happen in plan mode.** Plan mode is the safety switch: Claude Code can read and look around, but can't edit your code. The only difference between the two steps is what you ask for: an explanation, then a plan.
+- **Approving the plan is how you leave plan mode.** Claude Code switches to the mode the "Yes…" option names, and starts coding.
+- **The commit step is mostly you:** you test, you ask for a review, you ask for the commit.
+
 #### Everyday comparison: building a house extension
 
 1. **Explore:** the builder walks through your house, checks the walls and the pipes.
@@ -80,6 +96,8 @@ We'll follow the course's example the whole way through:
 
 > **You:** "I need to add WebP conversion to our image upload pipeline. Figure out where in the pipeline it should happen, whether we need new dependencies, and how to approach it."
 
+The course does Explore and Plan with that one prompt. In section 1 we'll also split it into **two prompts**, one to explore and one to plan, so you can see each step clearly.
+
 Some words in that prompt:
 - **WebP** is an image format made by Google. WebP files are usually smaller than JPEG files of similar quality, so pages load faster.
 - An **image upload pipeline** is the chain of steps an uploaded picture goes through: check it, shrink it, save it.
@@ -118,32 +136,107 @@ C:\projects\photo-share\
 
 ### 1. Explore and plan: research before any code
 
-#### The fastest way: plan mode
+#### Plan mode in 30 seconds
 
-The course says the fastest way to do steps 1 and 2 is **plan mode** (lesson 4). In plan mode, Claude Code **can't edit files**. It only reads, searches, and thinks.
+The course says the fastest way to do steps 1 and 2 is **plan mode** (lesson 4). **Plan mode** is a permission mode where Claude Code can look but not touch. It can read files, search, and run commands that only look around (like `git log`). It **can't edit your code** until you approve a plan.
 
-1. Start Claude Code in your project: `cd C:\projects\photo-share`, then `claude`.
-2. Press **Shift+Tab** until the status bar under the text box shows `⏸ plan mode on`.
-3. Type the prompt.
+*Everyday comparison:* a builder walking through your house with their hands in their pockets. They can open doors and look at the pipes, but they can't pick up a hammer until you sign the drawing.
+
+**Why use plan mode for exploring?** You could just ask "don't change anything" in a normal mode. But that's only a request. Plan mode actually **blocks** the edits, so a misunderstood prompt can't change your code.
+
+| To… | Do this |
+|---|---|
+| Turn plan mode on | Press **Shift+Tab** until the status bar shows `⏸ plan mode on` |
+| Use plan mode for one prompt only | Start the prompt with `/plan`, for example `/plan how does the upload pipeline work?` |
+| Start Claude Code already in plan mode | `claude --permission-mode plan` |
+| Leave plan mode by approving the plan | Pick one of the **"Yes…"** options under the plan |
+| Stay in plan mode and change the plan | Pick **"No, keep planning"** (or type in the last option) and say what to change |
+| Leave plan mode without a plan | Press **Shift+Tab** again |
 
 ![Claude Code status bar showing "plan mode on (shift+tab to cycle)" under the text input](images/05-plan-mode-status-bar.png)
 
-#### What Claude Code does while exploring
+<!-- IMAGE: status bar showing "plan mode on (shift+tab to cycle) · esc to interrupt · ← 1 agent" → images/05-plan-mode-one-agent.png -->
 
-```text
-Read     package.json                 → sharp is already installed
-Read     src/upload/pipeline.js       → steps run: validate → resize → save
-Read     src/upload/resize.js         → output is always JPEG (line 7)
-Read     src/upload/storage.js        → saves files as <id>.jpg
-Read     tests/upload.test.js
-Search the web  "sharp webp output options"
-```
+**What does "← 1 agent" mean in the status bar?** While you're in plan mode, Claude Code may hand the reading to a built-in helper called the **Plan subagent**. "1 agent" means one helper is working right now. The helper reads the files in its own separate conversation and sends back what it found, so all that reading doesn't fill up your main conversation. You don't need to start it yourself. (More on subagents below and in lesson 9.)
 
-Two kinds of research happen:
+#### How to explore: step by step
+
+Exploring is not a button or a command. **It's just your first prompt: you ask Claude Code to read and explain, not to plan yet.**
+
+1. Open a terminal in your project and start Claude Code: `cd C:\projects\photo-share`, then `claude`.
+2. Press **Shift+Tab** until you see `⏸ plan mode on`.
+3. Type an **explore prompt**. Name the area to read and the question you want answered:
+
+   ```text
+   Read src/upload/ and package.json. Explain how an uploaded image
+   flows through the pipeline and which image library we use.
+   Don't make a plan yet.
+   ```
+
+4. Claude Code reads files (you see each tool call on screen, or a "← 1 agent" helper doing it):
+
+   ```text
+   Read     package.json                 → sharp is already installed
+   Read     src/upload/pipeline.js       → steps run: validate → resize → save
+   Read     src/upload/resize.js         → output is always JPEG (line 7)
+   Read     src/upload/storage.js        → saves files as <id>.jpg
+   Read     tests/upload.test.js
+   ```
+
+5. Claude Code answers with an explanation, something like:
+
+   ```text
+   An upload goes through 3 steps, run by pipeline.js:
+   1. validate.js checks the file type and size.
+   2. resize.js shrinks it to 1600px wide with sharp and always
+      saves it as JPEG (line 7).
+   3. storage.js saves it to uploads/ as <id>.jpg.
+   sharp is already in package.json.
+   ```
+
+6. **Check it understood correctly.** If something is unclear, ask a follow-up, still in plan mode: "Where is the `.jpg` file extension decided?" Keep going until you'd be happy explaining the code yourself.
+
+Two kinds of research can happen:
 - **Reading your files**, to see how the pipeline works today.
-- **Searching the web**, to check how a library works or what's current.
+- **Searching the web**, to check how a library works or what's current, like "sharp webp output options."
 
 Neither one changes anything. (Remember from lesson 2: files Claude Code reads are sent to the model.)
+
+#### How to plan: the second prompt
+
+Stay in plan mode. Now ask for the plan, and say what "done" means:
+
+```text
+Now I want to convert uploads to WebP. Where in the pipeline should it
+happen? Do we need new dependencies? Create a plan, with a "Done when" list.
+```
+
+Claude Code doesn't need to read everything again. The explanation from the explore step is already in the conversation.
+
+#### Shortcut: explore and plan in one prompt
+
+The course's single prompt ("Figure out where… whether we need new dependencies, and how to approach it") does both steps at once. Claude Code explores first, then writes the plan.
+
+| | One prompt | Two prompts |
+|---|---|---|
+| **Good for** | Code you know, smaller tasks | Code that's new to you, bigger tasks |
+| **Upside** | Faster | You check Claude Code understood the code **before** it plans. A wrong understanding leads to a wrong plan. |
+
+#### Explore and plan as a flow
+
+```mermaid
+flowchart TD
+    S["🧑 Shift+Tab →<br/>⏸ plan mode on"] --> EP["🧑 Explore prompt<br/>'Read src/upload/ and explain…'"]
+    EP --> R["💻 Claude Code reads files<br/>(maybe via a helper: ← 1 agent)<br/>no edits possible"]
+    R --> EX["💻 Explanation of how<br/>the code works today"]
+    EX --> Q{"🧑 Understood<br/>correctly?"}
+    Q -- "no: ask a follow-up" --> EP
+    Q -- "yes" --> PP["🧑 Plan prompt<br/>'Create a plan, with Done when…'"]
+    PP --> PL["💻 Plan + options"]
+    PL --> A{"🧑 Plan looks right?"}
+    A -- "no: keep planning" --> PL
+    A -- "yes: approve" --> C["Plan mode turns off →<br/>step 3: Code"]
+```
 
 #### What the plan looks like
 
@@ -212,10 +305,23 @@ organized and how an image upload flows through it.
 |---|---|---|
 | **Goal** | Make a plan to change something | Understand the code, no change planned |
 | **What you get** | A step-by-step plan to approve | A summary |
-| **Where the reading happens** | In your main conversation | In the helper's own conversation; only the summary comes back |
+| **Where the reading happens** | In your main conversation, or handed to the Plan subagent ("← 1 agent") | In the helper's own conversation; only the summary comes back |
 | **Can it edit?** | Not until you approve the plan | No, never |
 
 **Why the separate conversation matters:** exploring can mean reading dozens of files. If that happens in your main conversation, all those files fill up the context window (lesson 2). The Explore subagent reads them in its own space and hands you only the summary.
+
+#### Four things with "Explore" or "Plan" in the name
+
+The names overlap, which is confusing. Here's what each one is:
+
+| Name | What it is | Who starts it | Can it edit your code? |
+|---|---|---|---|
+| **Explore step** | Step 1 of the workflow: a prompt asking Claude Code to read and explain | You, by typing the prompt | No (in plan mode) |
+| **Plan mode** | A permission mode: the "look, don't touch" switch | You, with **Shift+Tab** or `/plan` | No, until you approve a plan |
+| **Plan subagent** | A built-in helper that does the reading **while you're in plan mode** | Claude Code, on its own ("← 1 agent") | No, read-only |
+| **Explore subagent** | A built-in helper that does read-only searching **outside** plan mode | Claude Code on its own, or you by asking for it | No, read-only |
+
+So: you do the **Explore step** in **plan mode**, and Claude Code may use a **subagent** behind the scenes to do the reading.
 
 #### When can I skip the plan?
 
@@ -225,15 +331,31 @@ The official docs say planning adds some overhead. Skip it for small, clear chan
 
 ### 2. Code: build it and check it
 
-#### Approve the plan
+#### How to do it: step by step
 
-When the plan looks good, approve it. Claude Code then works through the plan's steps. Your **permission mode** (lesson 4) decides how it goes:
+1. **Approve the plan.** Under the plan, pick one of the **"Yes…"** options (use the arrow keys and Enter, or type the option's number). That turns plan mode off. Claude Code switches to the mode the option names and starts coding right away. You don't have to type anything else.
+2. **Watch it work.** You see each edit and command on screen. Depending on the mode you picked, Claude Code may stop and ask you before some of them.
+3. **Step in if needed.** Press **Esc** to stop Claude Code mid-action, then type what to change. Your conversation is kept, so it carries on from there.
+4. **Wait for the finish.** Claude Code says it's done when the plan's "Done when" list is met, for example "All 9 tests pass."
+
+**Left plan mode without approving?** (For example, you pressed Shift+Tab.) Then ask for the build yourself:
+
+```text
+Implement the plan. Run npm test and fix any failures.
+```
+
+#### Which "Yes" to pick
+
+The option you pick sets the **permission mode** (lesson 4) for the build:
 
 | You choose | What Claude Code does |
 |---|---|
-| **Ask at each step** (Manual) | Asks before every edit and command. |
-| **Auto-accept file edits** | Edits freely, asks before most commands. |
-| **Auto mode** | Asks nothing. A background safety check screens each action. |
+| **Yes, manually approve edits** (Manual) | Asks before every edit and command. Pick this for risky changes or code you don't know. |
+| **Yes, auto-accept edits** | Edits freely, asks before most commands. |
+| **Yes, and use auto mode** | Asks nothing. A background safety check screens each action. |
+| **Yes, clear context and…** (if shown) | Empties the conversation first, so the build starts fresh with only the plan. |
+
+The exact names depend on your version and settings.
 
 #### Claude troubleshoots, and sometimes you step in
 
@@ -306,6 +428,20 @@ before resizing so phone photos keep the right orientation.
 
 ### 3. Commit: review, then save your work
 
+#### How to do it: the short version
+
+Stay in the same session, in any mode except plan mode (plan mode would block the commit). Then:
+
+| # | You do | You type |
+|:---:|---|---|
+| 1 | Try the change yourself | Nothing. Run the app and upload a few photos. |
+| 2 | Get a review | `/code-review` |
+| 3 | Fix what matters | "Fix issue 1. Ignore the style suggestions." |
+| 4 | Commit | "Commit these changes with a message in the same style as our recent commits." |
+| 5 | Push (optional) | "Push to GitHub." Or run `git push` yourself. |
+
+Each step is explained below.
+
 #### Step 1: Test it yourself
 
 Before you commit, **try the change yourself**. Upload a few photos. Look at them. The course says commit only once you've tested it and you're happy.
@@ -376,14 +512,16 @@ sequenceDiagram
     participant PC as 🗂️ Your files & terminal
     participant SA as 🔍 Reviewer subagent
 
-    Note over You,CC: 1. EXPLORE (plan mode on)
-    You->>CC: "Add WebP conversion to our upload pipeline..."
+    Note over You,CC: 1. EXPLORE (Shift+Tab → plan mode on)
+    You->>CC: "Read src/upload/ and explain how an upload flows..."
     CC->>PC: read package.json, pipeline.js, resize.js, storage.js
     PC-->>CC: sharp installed, output is JPEG
+    CC->>You: explanation: validate → resize → save, always JPEG
 
-    Note over You,CC: 2. PLAN
+    Note over You,CC: 2. PLAN (still plan mode)
+    You->>CC: "Now convert uploads to WebP. Create a plan."
     CC->>You: plan: change resize.js + storage.js, no new dependency, "Done when..."
-    You-->>CC: "Also keep old .jpg links working." → approve
+    You-->>CC: "Also keep old .jpg links working." → pick "Yes..." (plan mode off)
 
     Note over CC,PC: 3. CODE
     CC->>PC: edit resize.js, storage.js, tests
@@ -412,7 +550,11 @@ sequenceDiagram
 |---|---|
 | "Planning slows me down. I'll just ask for the code." | Skipping the plan usually means more course-correcting later. Fixing a plan costs a sentence. |
 | "Every task needs a plan." | Small, clear changes (a typo, a rename) don't. If you can describe the change in one sentence, skip it. |
+| "There's an Explore button or command." | Each step is just a prompt. Exploring means asking Claude Code to read and explain, in plan mode. |
+| "In plan mode, Claude Code can't do anything." | It can read, search, and run look-only commands. It just can't edit your code until you approve a plan. |
+| "After approving the plan, I have to type 'now build it'." | Approving switches plan mode off and Claude Code starts coding right away. |
 | "Explore means I have to be in plan mode." | You can use the Explore subagent without plan mode, to get a summary of the codebase. |
+| "'← 1 agent' means something went wrong." | It means Claude Code has started a helper (a subagent) to do the reading. That's normal in plan mode. |
 | "If the tests pass, the code is right." | Only if the tests check the right thing. A weak test can pass when the code is wrong (a false positive). |
 | "The session that wrote the code is the best reviewer." | It's biased by what it meant to write. A subagent reviews with a fresh context. |
 | "Claude Code will remember a fix next session on its own." | Save it to `CLAUDE.md` so it's loaded every session. |
@@ -427,25 +569,43 @@ Explore, plan, code, commit. Look at the code, agree on a plan, build and test, 
 </details>
 
 <details>
-<summary>2. Why is the plan the best place to course-correct?</summary>
+<summary>2. How do you do the Explore step in Claude Code?</summary>
+
+Press Shift+Tab until the status bar shows `⏸ plan mode on`. Then type a prompt asking Claude Code to read part of the code and explain how it works, without planning yet. For example: "Read src/upload/ and explain how an upload flows through the pipeline."
+</details>
+
+<details>
+<summary>3. What are three ways to turn on plan mode?</summary>
+
+Press Shift+Tab until `⏸ plan mode on` shows. Start a single prompt with `/plan`. Or start Claude Code with `claude --permission-mode plan`.
+</details>
+
+<details>
+<summary>4. You approve the plan. What happens next?</summary>
+
+Plan mode turns off. Claude Code switches to the mode named in the option you picked (for example, auto-accept edits) and starts coding right away.
+</details>
+
+<details>
+<summary>5. Why is the plan the best place to course-correct?</summary>
 
 No code has been written yet. Changing the plan costs one sentence. Changing code means undoing and redoing edits across files.
 </details>
 
 <details>
-<summary>3. You only want a summary of how a codebase works. What can you use instead of plan mode?</summary>
+<summary>6. You only want a summary of how a codebase works. What can you use instead of plan mode?</summary>
 
 The Explore subagent. It's a built-in, read-only helper that reads the code in its own separate conversation and sends back a summary.
 </details>
 
 <details>
-<summary>4. A test checks only that "a file was saved." Why is that a problem for the WebP feature?</summary>
+<summary>7. A test checks only that "a file was saved." Why is that a problem for the WebP feature?</summary>
 
 It would pass even if the file is still a JPEG. That's a false positive: the test is green, but the feature doesn't work. The test should check that the saved file really is WebP.
 </details>
 
 <details>
-<summary>5. Why use a subagent to review code before committing?</summary>
+<summary>8. Why use a subagent to review code before committing?</summary>
 
 The main session wrote the code, so it's biased toward it. A subagent starts with a fresh, empty context and sees only the code, so it's more likely to spot real mistakes.
 </details>
@@ -454,9 +614,10 @@ The main session wrote the code, so it's biased toward it. A subagent starts wit
 
 ### Recap
 
-- **Explore:** Claude Code reads your code to get the context it needs. Use plan mode, or the Explore subagent if you only want a summary.
-- **Plan:** Claude Code writes a plan of action, including what "done" looks like. Review it and revise it. This is the cheapest place to fix mistakes.
-- **Code:** approve the plan; your permission mode decides how often Claude Code asks. It tests and fixes on its own, and you step in when needed. Give it success criteria, tools like Claude in Chrome, and a trustworthy test suite. Save repeated fixes to `CLAUDE.md`.
+- **Every step is a prompt** sent in the right mode. Shift+Tab changes the mode. The status bar shows which mode you're in.
+- **Explore:** turn on plan mode, then ask Claude Code to read the code and explain it. Ask follow-ups until it has understood correctly. Use the Explore subagent if you only want a summary.
+- **Plan:** still in plan mode, ask for a plan, including what "done" looks like. Review it and revise it. This is the cheapest place to fix mistakes.
+- **Code:** approve the plan with a "Yes…" option. That turns plan mode off and Claude Code starts building. The option you pick decides how often Claude Code asks. It tests and fixes on its own, and you step in when needed. Give it success criteria, tools like Claude in Chrome, and a trustworthy test suite. Save repeated fixes to `CLAUDE.md`.
 - **Commit:** test it yourself, have a subagent review it with fresh eyes, let Claude Code write the commit message in your style, push, and start the next feature.
 
 ---
@@ -464,6 +625,10 @@ The main session wrote the code, so it's biased toward it. A subagent starts wit
 ## My notes / practice
 
 - [ ] Pick a small feature in a test project. Do all four steps on purpose, and notice where I course-correct.
+- [ ] Press Shift+Tab a few times and watch the status bar cycle through the modes until `⏸ plan mode on`.
+- [ ] Do the Explore step as its own prompt ("Read … and explain …, don't plan yet"), then ask for the plan in a second prompt.
+- [ ] Try `/plan` in front of a single prompt instead of switching modes.
+- [ ] Watch for "← 1 agent" in the status bar while Claude Code explores in plan mode.
 - [ ] In plan mode, add a "Done when" list to my prompt and see if the plan uses it.
 - [ ] Ask "Use the Explore subagent to summarize this codebase" without plan mode.
 - [ ] Write one test that could give a false positive, then fix it so it checks the real result.
@@ -492,69 +657,100 @@ Because it may solve the wrong problem or pick the wrong approach. Then you spen
 **Q3. What does "course-correct" mean?**
 Stopping Claude Code and steering it in a new direction, like "Do it in the resize step instead."
 
-**Q4. What's the fastest way to explore and plan?**
-Plan mode. Press **Shift+Tab** until the status bar shows `⏸ plan mode on`, then type your request. Claude Code reads files and searches the web, but can't edit anything, and then gives you a plan.
+**Q4. How do I do each of the four steps in Claude Code?**
+Each step is a prompt you type, in the right mode:
+1. **Explore:** press Shift+Tab until `⏸ plan mode on` shows. Type "Read src/upload/ and explain how it works. Don't plan yet."
+2. **Plan:** stay in plan mode. Type "Now create a plan to add WebP, with a 'Done when' list."
+3. **Code:** pick a "Yes…" option under the plan. Plan mode turns off and Claude Code starts building.
+4. **Commit:** test it yourself, run `/code-review`, then type "Commit in the style of our recent commits."
 
-**Q5. What does Claude Code do while it explores?**
+**Q5. What does "plan mode" mean?**
+A permission mode where Claude Code can look but not touch. It can read files, search, and run commands that only look around. It can't edit your code until you approve a plan.
+
+**Q6. How do I turn plan mode on and off in Claude Code?**
+- **On:** press **Shift+Tab** until the status bar shows `⏸ plan mode on`, or start Claude Code with `claude --permission-mode plan`.
+- **Off:** approve the plan with a "Yes…" option, or press **Shift+Tab** again to leave without a plan.
+
+**Q7. What does `/plan` do?**
+It puts a single prompt in plan mode without switching modes yourself. For example: `/plan how does the upload pipeline work?`
+
+**Q8. How do I do the Explore step?**
+Turn on plan mode. Then ask Claude Code to read a part of the code and explain it, and say you don't want a plan yet. For example: "Read src/upload/ and package.json. Explain how an uploaded image flows through the pipeline. Don't make a plan yet." Ask follow-ups until the explanation is right.
+
+**Q9. What does Claude Code do while it explores?**
 It reads the files that matter for your request and may search the web, for example to check how a library works. It doesn't change anything.
 
-**Q6. What should I check when Claude Code shows me a plan?**
+**Q10. What does "← 1 agent" mean in the Claude Code status bar?**
+Claude Code has started one helper (a subagent) that is working right now. In plan mode, that's usually the built-in Plan subagent doing the reading in its own separate conversation. It's normal; you don't need to do anything.
+
+**Q11. Why explore and plan in two prompts instead of one?**
+So you can check Claude Code understood the code before it plans. If its understanding is wrong, the plan will be wrong too. For code you already know, one prompt that asks for both is fine.
+
+**Q12. What should I check when Claude Code shows me a plan?**
 Whether it meets your criteria: is the approach right, are the right files changing, is anything missing, and does it say what "done" looks like? If not, ask Claude Code to revise those parts: type the change in the last option of the approval list (for example, "Can you make the upload limit 10mb?"), or press **Ctrl+G** to edit the plan file yourself.
 
-**Q7. Why is the plan the best place to course-correct?**
+**Q13. Why is the plan the best place to course-correct?**
 No code exists yet. Changing a plan takes one sentence. Changing code means undoing and redoing edits.
 
-**Q8. What does "Explore subagent" mean?**
+**Q14. What does "Explore subagent" mean?**
 A built-in helper in Claude Code that only reads. It searches and reads your code in its own separate conversation, then sends back a summary. It can't edit files.
 
-**Q9. When should I use the Explore subagent instead of plan mode?**
+**Q15. What does "Plan subagent" mean?**
+A built-in, read-only helper that Claude Code uses while you're in plan mode. It reads the code in its own conversation and reports back, so your main conversation doesn't fill up with file contents. Claude Code starts it on its own.
+
+**Q16. When should I use the Explore subagent instead of plan mode?**
 When you only want to understand a codebase and don't plan to change anything yet. Ask: "Use the Explore subagent to summarize how this codebase is organized."
 
-**Q10. Do I always need to make a plan?**
+**Q17. Do I always need to make a plan?**
 No. For small, clear changes like a typo or a rename, just ask. The docs' rule of thumb: if you can describe the change in one sentence, skip the plan.
 
-**Q11. What happens after I approve the plan?**
-Claude Code works through the plan's steps. Your permission mode decides how: it asks at each step (Manual), auto-accepts file edits, or runs in Auto mode with a background safety check.
+**Q18. What happens after I approve the plan?**
+Plan mode turns off and Claude Code starts working through the plan right away. You don't need to type "go." The option you picked decides how often it asks you:
+- **Manually approve edits:** asks before every edit and command.
+- **Auto-accept edits:** edits freely, asks before most commands.
+- **Auto mode:** asks nothing; a background safety check screens each action.
 
-**Q12. Why does starting in plan mode help when I need to step in later?**
+**Q19. Why does starting in plan mode help when I need to step in later?**
 The conversation already holds everything: the files Claude Code read, the plan, and every change. When something goes wrong, Claude Code can use that history to decide what to do next.
 
-**Q13. What does "success criteria" mean?**
+**Q20. What does "success criteria" mean?**
 A clear description of what "correct" looks like, such as "all tests pass and the saved file is really WebP." Claude Code uses it to know when it's finished. Put it in your plan.
 
-**Q14. Why should I give Claude Code extra tools?**
+**Q21. Why should I give Claude Code extra tools?**
 So it can check its own work instead of waiting for you. Each check it can do itself saves a round of back and forth.
 
-**Q15. What does Claude in Chrome do for Claude Code?**
+**Q22. What does Claude in Chrome do for Claude Code?**
 It lets Claude Code control a browser tab: open your web page, click, fill in forms, read console errors, and take screenshots. That way it can test a web page before calling the work done. It needs Chrome or Edge, a paid Claude plan, and you start it with `claude --chrome` or `/chrome`.
 
-**Q16. What does "test suite" mean, and why does Claude Code need one?**
+**Q23. What does "test suite" mean, and why does Claude Code need one?**
 A set of automated checks that say "pass" or "fail." Claude Code can run them over and over while it works, so it knows right away if a change broke something.
 
-**Q17. What does "false positive" mean for tests?**
+**Q24. What does "false positive" mean for tests?**
 A test that passes even though the code is wrong. For example, a test that only checks "a file was saved" passes even if the file is still a JPEG instead of WebP. Make sure your tests check the real result before you trust them.
 
-**Q18. Can Claude Code write tests for me?**
+**Q25. Can Claude Code write tests for me?**
 Yes. But read them before trusting them, so they truly check what you want and don't give false positives.
 
-**Q19. Claude Code keeps making the same mistake. What should I do?**
+**Q26. Claude Code keeps making the same mistake. What should I do?**
 Ask it to save the fix to `CLAUDE.md`. Claude Code reads that file at the start of every session, so it remembers the fix next time.
 
-**Q20. What should I do before I commit?**
-1. Test the change yourself.
-2. Have a subagent review the code.
-3. Ask Claude Code to write the commit message in your style.
+**Q27. How do I do the Commit step?**
+In the same session, in any mode except plan mode:
+1. Test the change yourself, for example by uploading a few photos.
+2. Run `/code-review`, and fix the issues that matter.
+3. Type "Commit these changes with a message in the same style as our recent commits."
+4. Push, if you want: "Push to GitHub," or run `git push` yourself.
 
-**Q21. Why should a subagent review the code instead of the main session?**
+**Q28. Why should a subagent review the code instead of the main session?**
 The main session wrote the code, so it's biased toward it. A subagent starts with a fresh, empty conversation and sees only the code, like a friend proofreading your essay.
 
-**Q22. How do I get a code review from a subagent?**
+**Q29. How do I get a code review from a subagent?**
 Run `/code-review`, or ask in plain words: "Use a subagent to review my changes for bugs." You can also save your own reviewer in `.claude/agents/code-reviewer.md`.
 
-**Q23. How does Claude Code write a commit message in my style?**
+**Q30. How does Claude Code write a commit message in my style?**
 Ask it to match your recent commits. It can read your commit history with `git log` and copy the format, like `feat(upload): ...`.
 
-**Q24. (Exam angle) A team lead says their developers waste hours undoing Claude Code's changes. What workflow would you recommend?**
+**Q31. (Exam angle) A team lead says their developers waste hours undoing Claude Code's changes. What workflow would you recommend?**
 Explore, plan, code, commit:
 - Start multi-step work in plan mode, so the approach is agreed before any edit.
 - Put clear success criteria in every plan.
@@ -563,7 +759,7 @@ Explore, plan, code, commit:
 
 This fits the **Developer Productivity & Operational Enablement** exam domain.
 
-**Q25. (Exam angle) Claude Code says a feature is done and all tests pass, but it's broken in production. What went wrong, and how do you prevent it?**
+**Q32. (Exam angle) Claude Code says a feature is done and all tests pass, but it's broken in production. What went wrong, and how do you prevent it?**
 Probably the tests gave a **false positive**: they passed without checking the real behavior. To prevent it:
 - Review tests before trusting them, so they're a true source of truth.
 - Define clear success criteria in the plan.
@@ -572,7 +768,7 @@ Probably the tests gave a **false positive**: they passed without checking the r
 
 This fits the **Governance, Safety & Risk** exam domain.
 
-**Q26. (Exam angle) An architect asks why code review should use a separate subagent instead of the same Claude Code session. How do you answer?**
+**Q33. (Exam angle) An architect asks why code review should use a separate subagent instead of the same Claude Code session. How do you answer?**
 The session that wrote the code carries its own reasoning and assumptions in its context, so it tends to confirm its own work. A subagent starts with a fresh context and sees only the changes and the criteria you give it, so it judges the result on its own. It's the same idea as not letting authors approve their own pull requests. This fits the **Governance, Safety & Risk** exam domain.
 
 ---
