@@ -16,8 +16,8 @@ Every lesson is one notes file directly in this folder, named `0X-lesson-name.md
 | 4 | Your first prompt | Your first prompt | [04-your-first-prompt.md](04-your-first-prompt.md) | ✅ Done |
 | 5 | Daily workflows | The explore → plan → code → commit workflow | [05-explore-plan-code-commit.md](05-explore-plan-code-commit.md) | ✅ Done |
 | 6 | Daily workflows | Context management | [06-context-management.md](06-context-management.md) | ✅ Done |
-| 7 | Daily workflows | Code review | `07-code-review.md` | ⬜ |
-| 8 | Customizing Claude Code | The CLAUDE.md file | `08-claude-md-file.md` | ⬜ |
+| 7 | Daily workflows | Code review | [07-code-review.md](07-code-review.md) | ✅ Done |
+| 8 | Customizing Claude Code | The CLAUDE.md file | [08-claude-md-file.md](08-claude-md-file.md) | ✅ Done |
 | 9 | Customizing Claude Code | Subagents | `09-subagents.md` | ⬜ |
 | 10 | Customizing Claude Code | Skills | `10-skills.md` | ⬜ |
 | 11 | Customizing Claude Code | MCP | `11-mcp.md` | ⬜ |
