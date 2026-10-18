@@ -141,13 +141,13 @@ To use it well, remember three things:
 
 ## FAQ
 
-**Q1. What is Claude Code in one sentence?**
+**Q1. What is Claude Code, in one sentence?**
 An agentic coding tool that reads your codebase, edits files, runs commands, and connects to external tools to help you get coding work done faster.
 
 **Q2. How is Claude Code different from Claude.ai?**
 Both use the same Claude model, but they can reach different things. In Claude.ai, Claude only sees what you paste into the chat, and you copy its answers back into your project yourself. Claude Code works inside your project: it opens your files, runs commands in your terminal, and makes the changes directly.
 
-**Q3. What makes Claude Code an "agent"?**
+**Q3. What does "agent" mean, and why is Claude Code called one?**
 An agent is software that takes actions in its environment to reach a goal. Claude Code does this by running in a loop:
 1. Decide the next step.
 2. Take the action (read a file, run a command, edit code).
@@ -156,7 +156,7 @@ An agent is software that takes actions in its environment to reach a goal. Clau
 
 Step 3 is what makes it an agent rather than a chatbot. It reacts to what actually happened, such as a failing test, instead of just generating one answer and stopping.
 
-**Q4. What can an AI agent use to reach its goal?**
+**Q4. What can an AI agent use to get a task done?**
 - **Tools**: built-in abilities such as reading files, editing code, or running commands.
 - **External services**: outside systems such as APIs, databases, or issue trackers.
 - **Other AI agents**: it can hand part of the task to another agent.
@@ -164,10 +164,10 @@ Step 3 is what makes it an agent rather than a chatbot. It reacts to what actual
 **Q5. Where can I use Claude Code?**
 The terminal (CLI), VS Code, JetBrains IDEs, the Claude Desktop app, and the web.
 
-**Q6. What is the context window?**
+**Q6. What does "context window" mean?**
 The context window is all the text Claude can see at one time. That includes your messages, Claude's replies, the files it has read, and the output of commands it has run. Think of it as Claude's short-term memory. Anything outside the window, Claude can't see. The window is large but has a fixed size, measured in tokens (pieces of words).
 
-**Q7. Why doesn't Claude Code just load my whole codebase into context?**
+**Q7. Why doesn't Claude Code read my whole project at the start?**
 Two reasons:
 1. **It usually won't fit.** A real codebase is often bigger than the context window.
 2. **More isn't better.** Even when it fits, filling the window with unrelated files leaves less room for the conversation and makes it harder for Claude to focus on what matters.
@@ -185,15 +185,15 @@ Yes. Three common ones:
 
 So review its changes and run tests before you accept them.
 
-**Q10. Give examples of tasks Claude Code can do.**
+**Q10. What kinds of tasks can Claude Code do?**
 - **Understand code**: explain how a feature works, or trace a bug back to its cause.
 - **Run things**: run builds and tests, install packages, then read the output and decide what to do next.
 - **Look things up**: search the web for current API documentation.
 
-**Q11. (Exam angle) Why does the permission model matter to an architect?**
-It's a **human-in-the-loop** control: a person has to approve an action before it happens. That matters for anything with real consequences, such as deleting files, changing production config, or running commands with side effects. On the exam, this maps to the **Governance, Safety & Risk** domain. In the capstone project, it's the **approval gate**.
+**Q11. (Exam angle) A team asks why Claude Code stops to ask permission. Why does that matter?**
+Asking permission is a **human-in-the-loop** control: a person has to approve an action before it happens. That matters for anything with real consequences, such as deleting files, changing production config, or running commands with side effects. On the exam, this maps to the **Governance, Safety & Risk** domain. In the capstone project, it's the **approval gate**.
 
-**Q12. (Exam angle) How does "it can make mistakes" affect how you design a workflow with Claude Code?**
+**Q12. (Exam angle) Claude Code can make mistakes. How should a team plan for that?**
 Assume the agent's output might be wrong, and design ways to catch it:
 - **Code review**: a person reads the changes before they're merged.
 - **Automated tests**: tests confirm the code still works.

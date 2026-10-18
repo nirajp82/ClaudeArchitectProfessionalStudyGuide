@@ -215,10 +215,10 @@ Run the install command for your system:
 - **Homebrew:** `brew install --cask claude-code`
 - **winget:** `winget install Anthropic.ClaudeCode`
 
-**Q3. What's the catch with Homebrew and winget?**
+**Q3. What's the downside of installing with Homebrew or winget?**
 They don't auto-update Claude Code. You have to run the upgrade command yourself, or you'll fall behind on features and fixes. The `curl` and PowerShell installers update automatically.
 
-**Q4. I installed it, but my terminal says `claude` isn't found. What do I do?**
+**Q4. I installed Claude Code, but my terminal says `claude` isn't found. What do I do?**
 Close the terminal and open a new one. A terminal only picks up newly installed programs when it starts.
 
 **Q5. What happens the first time I run `claude`?**
@@ -227,19 +227,19 @@ It asks you to choose a color theme, then sign in. You can sign in with a Claude
 **Q6. Which files can Claude Code access?**
 The folder you start it in, plus every folder inside it. For example, starting it in `~/projects/my-app` gives it access to `my-app` and its subfolders, but not `~/projects/other-app`. That's why you should start it in your project folder, never your home folder.
 
-**Q7. How do I install and open it in VS Code?**
+**Q7. How do I install and open Claude Code in VS Code?**
 Search "Claude Code" in the Extensions panel and install the one by Anthropic with the blue check. Restart VS Code if needed. Then press Ctrl/Cmd+Shift+P and run "Claude Code: Open in New Tab," or click the Claude logo in the sidebar.
 
-**Q8. Why look for the blue check on the VS Code extension?**
+**Q8. Why does the blue check mark on the VS Code extension matter?**
 It shows the extension is the official one published by Anthropic. Without it, you could install a copy made by someone else, and that copy would be able to see your code.
 
-**Q9. How do I use it in a JetBrains IDE?**
+**Q9. How do I use Claude Code in a JetBrains IDE, like IntelliJ or PyCharm?**
 Install the Claude Code plugin from the JetBrains Marketplace and restart the IDE. Click the Claude logo to open a pane with the terminal version running next to your editor.
 
 **Q10. What can the "Code" tab in Claude Desktop do?**
 It works like the chat, but it can work in a specific folder on your computer, change permission modes, and run in a cloud environment.
 
-**Q11. What's the main limit of Claude Code on the web?**
+**Q11. What can't Claude Code on the web do?**
 It only works with GitHub repositories. It can't open a folder on your computer.
 
 **Q12. Which option gets new features first?**
@@ -251,7 +251,7 @@ The terminal. New features ship there first.
 - **Folder access:** teach people to start Claude Code in the project folder, because it can reach everything below where it starts.
 - **Interface:** let people choose. The terminal and IDEs work on local code. The web is limited to GitHub repos.
 
-**Q14. (Exam angle) Why does "it can access the folder you run it in" matter for security?**
+**Q14. (Exam angle) A security team asks why it matters which folder you start Claude Code in. What do you tell them?**
 The starting folder sets how much Claude Code can reach. Starting it too high, such as in a home folder, could expose files that have nothing to do with the task, like private documents or credentials. Starting it in the project folder keeps it limited to what the task needs. This idea, giving only the access a task needs, is called *least privilege*.
 
 ---

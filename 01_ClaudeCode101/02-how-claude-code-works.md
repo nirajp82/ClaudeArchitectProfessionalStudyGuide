@@ -744,39 +744,45 @@ The model can **ask** for anything, even something dangerous. Claude Code decide
 #### Test yourself
 
 <details>
-<summary>1. You ask Claude Code to fix a bug. Where does the file change: on your computer or on Anthropic's server?</summary>
+<summary>1. Claude Code fixes a bug in <code>login.js</code>. Where is the file changed?</summary>
 
-On your computer. The model only sends the instruction "edit this line." Claude Code makes the change on your disk, after checking your permission.
+On your computer. The model only sends an instruction: "replace this text with that text." Claude Code makes the change on your disk, after checking that you allow it.
 </details>
 
 <details>
-<summary>2. How does Claude Code (the CLI) know the task is finished?</summary>
+<summary>2. How does Claude Code know when to stop?</summary>
 
-The model replies with plain text instead of a tool call. No tool call means there's nothing left to do, so the loop ends.
+The model replies with plain text and no tool call. No tool call means there's nothing left to do, so Claude Code stops and shows you the answer.
 </details>
 
 <details>
-<summary>3. Why does the message Claude Code sends to the model get bigger every round?</summary>
+<summary>3. Why does each message to the model get longer?</summary>
 
-The model forgets everything after each reply, so Claude Code resends the whole conversation every time, plus the newest result. That growing message is the context window.
+The model forgets everything after each reply. So every time, Claude Code sends the whole conversation again, plus the newest result.
 </details>
 
 <details>
-<summary>4. Claude Code never opened a file. Can the model see that file?</summary>
+<summary>4. Can the model see a file that Claude Code never opened?</summary>
 
-No. Only what Claude Code sends gets to the server. Files that were never read stay on your computer.
+No. The model only sees what Claude Code sends. A file that was never opened stays on your computer.
 </details>
 
 <details>
-<summary>5. You type only "The login doesn't work." What else does Claude Code send to the model with your words?</summary>
+<summary>5. You type "The login doesn't work." What else gets sent with your words?</summary>
 
-The starter pack, which Claude Code prepared when it started: Anthropic's instructions (built into the program), the tool list, facts about your computer (folder, system, Git, date), and your `CLAUDE.md`. Claude Code puts your words at the bottom and sends it all as one message. No code is included yet.
+The starter pack. Claude Code puts it together when it starts:
+- Anthropic's instructions (built into Claude Code)
+- the tool list
+- facts about your computer: folder, system, Git, date
+- your `CLAUDE.md`
+
+Your words go at the bottom. No code is sent yet.
 </details>
 
 <details>
-<summary>6. Your project has 1,000 files. You ask Claude Code to rename a function that appears in 50 of them. What gets sent to the model?</summary>
+<summary>6. Your project has 1,000 files. You rename a function that's used in 50 of them. Which files get sent to the model?</summary>
 
-The search result (file names or matching lines), plus whatever Claude Code reads from the 50 files, often just the parts around each match. The edits go back as small "replace this with that" snippets. The other 950 files are never sent.
+Only what Claude Code reads. That's the search result, plus the parts of the 50 files it opens (often just the lines around each match). The other 950 files are never sent.
 </details>
 
 ---
@@ -806,125 +812,132 @@ Together, these are why Claude Code can do the work and check it, and not just c
 
 ## FAQ
 
-**Q1. How does Claude Code work, in simple terms?**
-It repeats a loop: look at the code, make a change, check if it worked. If it didn't work, it goes round again. If it did, it stops and waits for you.
+In these answers, **Claude Code** means the program on your computer. **The model** means the AI on Anthropic's servers.
+
+**Q1. How does Claude Code work?**
+It goes round in a loop: look at the code, make a change, check if it worked. If it didn't work, it tries again. If it did, it stops and waits for you.
 
 **Q2. What does "gather context" mean?**
-It means looking around before acting. Claude opens files, runs commands, and reads errors so it understands the problem before changing anything.
+Looking around before changing anything. Claude Code opens files, runs commands, and reads error messages, so it understands the problem first.
 
-**Q3. What is a tool call?**
-A request from the model to Claude Code, such as "open this file" or "run this command." The model can't touch your computer itself, so it asks Claude Code to do it. Claude Code does it and sends back the result.
+**Q3. What does "tool call" mean?**
+It's a request from the model to Claude Code, such as "open this file" or "run this command." The model can't touch your computer, so it asks Claude Code. Claude Code does it and sends back the result.
 
-**Q4. Why does it matter that Claude Code checks its own work?**
-A chatbot gives one answer and never finds out if it worked. Claude Code runs the test (or checks some other way) and keeps trying until it actually works.
+**Q4. Why does Claude Code test its own work?**
+So it knows the fix really works. A chatbot gives you an answer and never finds out if it was right. Claude Code runs the tests, sees the result, and keeps trying until they pass.
 
-**Q5. Can I change what Claude Code is doing while it's working?**
-Yes. You can add information ("the settings are in `config/auth.json`"), stop it, or change its direction ("only fix the test").
+**Q5. Can I step in while Claude Code is working?**
+Yes. You can give it more information ("the settings are in `config/auth.json`"), stop it, or change direction ("only fix the test").
 
-**Q6. What is the context window?**
-Everything Claude can remember right now: your messages, its replies, files it opened, and command output. Think of it as a whiteboard with a fixed size.
+**Q6. What does "context window" mean?**
+Everything the model can see right now: your messages, its replies, the files it opened, and command output. Think of it as a whiteboard with a fixed size.
 
-**Q7. What happens when the context window is full?**
-Claude Code **compacts** it automatically. It erases what isn't needed and summarizes the rest so the session can keep going. Some detail is lost, so if Claude needs something exact from much earlier, tell it again.
+**Q7. What happens when the context window fills up?**
+Claude Code shortens it automatically (the course calls this **compacting**). It keeps a summary of the older parts and drops the rest. Some detail is lost, so repeat anything exact that matters.
 
-**Q8. Why are tools so important?**
-Without tools, an AI can only talk. It can tell you how to fix something, but it can't do it. Tools let Claude read files, edit files, run commands, and search the web, so it does the work itself.
+**Q8. Why does Claude Code need tools?**
+Without tools, an AI can only talk. It can tell you how to fix something, but it can't do it. Tools let it read files, edit files, run commands, and search the web.
 
-**Q9. Do I have to tell Claude Code which tool to use?**
-No. The model understands what you mean and picks the tool itself. If you ask "why does the login page crash?", it decides on its own to open the login code and look at the error.
+**Q9. Do I have to say which tool to use?**
+No. The model works out which tool it needs. If you ask "Why does the login page crash?", it decides to open the login code and look at the error.
 
 **Q10. What are the four permission modes?**
 - **Manual:** asks before every edit and every command.
-- **Auto-accept:** edits without asking, but asks before commands.
-- **Plan mode:** only looks and writes a plan. Changes nothing.
+- **Auto-accept:** makes edits without asking, but asks before commands.
+- **Plan mode:** only looks around and writes a plan. Changes nothing.
 - **Auto mode:** doesn't ask, but a safety checker blocks dangerous actions.
 
-Switch between them with **Shift+Tab**.
+Press **Shift+Tab** to switch between them.
 
-**Q11. Why does auto-accept still ask before running commands?**
-An edit is easy to see and undo. A command can do things that are hard to undo, like deleting files or installing software. So commands still need your OK.
+**Q11. In auto-accept mode, why does Claude Code still ask before running a command?**
+Because an edit is easy to check and undo, but a command may not be. A command can delete files or install software. So commands still need your OK.
 
-**Q12. In auto mode, what does the safety checker block?**
-Actions that can't be undone (like deleting a database), that destroy things (like wiping a folder), or that reach outside your project (like sending files to another website). If something is blocked, Claude tries a safer way or asks you.
+**Q12. In auto mode, what does the safety checker stop?**
+- Actions that can't be undone, like deleting a database.
+- Actions that destroy things, like wiping a folder.
+- Actions that reach outside your project, like sending files to another website.
 
-**Q13. What runs on my computer, and what runs on Anthropic's servers?**
-- **Your computer:** Claude Code, the hands. It searches, reads, and edits files, runs commands, asks your permission, and keeps the conversation history.
-- **Anthropic's servers:** the model, the brain. It reads the messages Claude Code sends and decides the next step.
+If something is blocked, Claude Code tries a safer way or asks you.
 
-**Q14. Is "Claude Code" the CLI on my computer, or something on Anthropic's server?**
-The **CLI on your computer**: the program you start by typing `claude`. Everything labelled "Claude Code does" happens there: building the starter pack, searching, reading and editing files, running commands, and asking your permission. The only thing on Anthropic's servers is the **model**, which reads the messages and decides the next step.
+**Q13. What's the difference between Claude Code and the model?**
+- **Claude Code** is the program you start by typing `claude`. It runs **on your computer**. It reads and edits files, runs commands, and asks your permission.
+- **The model** is the AI that decides what to do next. It runs **on Anthropic's servers**. It can't touch your computer.
 
-**Q15. Does the model see my whole codebase?**
-No. It only sees what Claude Code sends: your messages, plus the results of the tools it asked for, such as the files it read. Files that were never read stay on your computer.
+They talk only by sending messages over the internet.
 
-**Q16. What's in the very first message Claude Code sends to the model?**
-Your request, with a **starter pack** on top. Claude Code builds the starter pack when it starts, before you type anything:
-- **Instructions** written by Anthropic (the *system prompt*): "You are Claude Code, help with coding, ask before risky actions…"
-- **Tool list:** Grep, Glob, Read, Edit, Bash, and what each one does.
-- **Facts about your computer:** folder path, operating system, a short Git summary, the date.
+**Q14. Which things happen on my computer, and which happen on Anthropic's servers?**
+- **On your computer:** searching, reading and editing files, running commands and tests, asking your permission, and keeping the conversation history.
+- **On Anthropic's servers:** the model reading each message and deciding the next step.
+
+**Q15. Does the model see all my code?**
+No. It only sees what Claude Code sends: your messages and the results of the tools it asked for, such as the files it opened. Files that were never opened stay on your computer.
+
+**Q16. What does Claude Code send to the model first?**
+Your request, with a **starter pack** on top:
+- **Anthropic's instructions** (the *system prompt*): "You are Claude Code. Help with coding. Ask before risky actions…"
+- **The tool list:** Grep, Glob, Read, Edit, Bash, and what each one does.
+- **Facts about your computer:** folder, system, a short Git summary, the date.
 - **Your `CLAUDE.md`**, if you have one.
 
-**No code, and not even a list of your file names.** You only type the request. Claude Code adds the starter pack automatically, and sends it again at the top of every message.
+No code, and not even a list of your file names. Claude Code adds the starter pack for you and sends it at the top of every message.
 
-**Q17. Where are Anthropic's instructions (the system prompt) on my computer? Can I read them?**
-They're built into the Claude Code program itself (on Windows, usually `C:\Users\<you>\.local\bin\claude.exe`). They aren't a separate file, so you can't open and read them. What you can do:
-- Run `/context` to see how much space they take up.
-- Add your own instructions on top with `CLAUDE.md` (a normal file you can open and edit) or `claude --append-system-prompt "..."`.
+**Q17. Can I read Anthropic's instructions (the system prompt)?**
+No. They're built into the Claude Code program (on Windows, usually `C:\Users\<you>\.local\bin\claude.exe`), not saved as a separate file. You can:
+- run `/context` to see how much space they take up.
+- add your own instructions in `CLAUDE.md`, or with `claude --append-system-prompt "..."`.
 
-**Q18. Is the starter pack installed with the Claude Code CLI?**
-Only half of it. The CLI builds the starter pack each time you start `claude`:
-- **Installed with the CLI:** Anthropic's instructions and the built-in tool list. They're the same in every project.
-- **Collected at startup:** facts about your computer (folder, system, Git, date) and your project's `CLAUDE.md`. They change depending on which folder you start in.
+**Q18. Does the starter pack come installed with Claude Code?**
+Only half of it.
+- **Installed:** Anthropic's instructions and the built-in tool list. They're the same in every project.
+- **Collected each time you start `claude`:** facts about your computer and your project's `CLAUDE.md`. They change depending on which folder you're in.
 
-There's no single starter-pack file. Start `claude` in two different projects, and the model gets the same instructions but different facts and rules.
+**Q19. When Claude Code searches for "login", what does the model see?**
+Only the search result, which by default is the **names** of the matching files, such as `src/login.js`. The search itself runs on your computer and skips anything your `.gitignore` ignores. The model sees what's inside a file only if it then asks to **Read** that file.
 
-**Q19. When Claude Code searches for "login", what gets sent to the server?**
-Claude Code searches the text inside the files in your project folder **on your computer**, skipping anything your `.gitignore` ignores. Only the result goes to the server, which by default is the **names** of the matching files, such as `src/login.js`. The files' contents are sent only if the model then asks to **Read** a file.
+**Q20. If the model forgets everything after each reply, how does the model keep track of a long task?**
+Claude Code sends the **whole conversation** every time: your request, every tool call, every file it read, every result. The model reads it all again from the start each time.
 
-**Q20. The model forgets everything after each reply. How can the model still follow a long task?**
-Claude Code sends the **whole conversation** with every message: your request, every tool call, every file read, every result. The model reads it all fresh each time. That growing message is the context window.
+**Q21. Isn't it slow to send the whole conversation every time?**
+Less than you'd think. Anthropic's servers can reuse parts of a message they've already seen (this is called *prompt caching*). That makes repeating the history faster and cheaper.
 
-**Q21. Isn't sending the whole conversation every time slow and wasteful?**
-Less than it sounds. Anthropic's servers can reuse the parts of a message they've already seen (this is called *prompt caching*), so repeating the history is faster and cheaper than processing it from scratch.
+**Q22. Where do the tests run?**
+On your computer. Claude Code runs the test command with your files. The model only asks for the command and reads the output.
 
-**Q22. When Claude Code runs the tests, where do the tests run?**
-On your computer. Claude Code runs the command using your files and your tools. The model only sends the instruction and reads the output that comes back.
-
-**Q23. How does Claude Code know the loop is finished?**
+**Q23. How does Claude Code know the task is done?**
 The model replies with plain text instead of a tool call. No tool call means there's nothing left to do.
 
-**Q24. Could the model delete my files directly?**
-No. It can't touch your computer. It can only *ask* Claude Code, and Claude Code checks your permission mode before doing anything.
+**Q24. Can the model delete my files?**
+Not by itself. It can only *ask* Claude Code to do something. Claude Code checks your permission mode before doing anything.
 
-**Q25. My task changes 50 files. Does Claude Code send all 50 files to the server?**
-Claude Code sends **what it reads**, not what it touches. If it reads all 50 files, their contents are sent, often only the parts around each change, and a few files at a time rather than all at once. Files it never opens, and files with no search match, are never sent. Edits go back as small "replace this with that" snippets, not whole files.
+**Q25. If a change affects 50 files, are all 50 sent to the model?**
+Only the parts Claude Code **reads**. That's often just the lines around each change, a few files at a time. Files it never opens are never sent. Edits go back as small "replace this with that" pieces, not whole files.
 
-**Q26. When the context window is compacted, does that undo anything already sent to the server?**
-No. Compacting only changes what goes in **later** messages. Anything already sent was sent.
+**Q26. When Claude Code shortens the conversation to save space, does that take back what was already sent?**
+No. Shortening only changes what goes into **future** messages. Anything already sent has been sent.
 
-**Q27. Do subagents stop my files from being sent to the server?**
-No. A subagent reads files in its own separate session, which keeps your **main** conversation small. But it's also a model on Anthropic's servers, so what it reads is still sent.
+**Q27. What does "subagent" mean, and are the files it reads still sent to the model?**
+A subagent is a separate helper session that Claude Code starts for a side task. It keeps your **main** conversation shorter. But the subagent also uses a model on Anthropic's servers, so **yes**, whatever the subagent reads is sent too.
 
-**Q28. (Exam angle) How should a team choose a permission mode?**
-Give Claude less freedom when mistakes would be costly:
+**Q28. (Exam angle) Your team is choosing a permission mode. How should they decide?**
+The more a mistake would cost, the less freedom Claude Code should get:
 - **Plan mode** for big or risky changes, so a person approves the plan first.
 - **Manual** or **auto-accept** for everyday work, so a person still approves commands.
 - **Auto mode** only where its safety checks are good enough for that project.
 
-Put the choice in the settings file so the whole team works the same way, instead of each person deciding. This fits the **Governance, Safety & Risk** exam domain.
+Put the choice in the team's shared settings file, so everyone works the same way. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q29. (Exam angle) Why is turning off permission questions risky, and how do you reduce the risk?**
-Without the questions, a mistake happens before anyone can stop it. To reduce the risk:
+**Q29. (Exam angle) A developer wants to turn off all permission questions. What could go wrong, and how do you make it safer?**
+Without the questions, a mistake happens before anyone can stop it, for example a command that deletes files. To make it safer:
 - Keep a person approving anything that can't be undone.
 - Use Plan mode to agree on the approach first.
-- Run Claude in a separate test environment, so a bad command can't harm real systems.
+- Run Claude Code in a separate test environment, so a bad command can't harm real systems.
 - Use tests to catch mistakes after changes are made.
 
-**Q30. (Exam angle) A security team asks, "What data leaves our machines when developers use Claude Code?" How do you answer?**
-- **What leaves:** the messages Claude Code sends to the model. That means the developer's requests, plus the results of any tools Claude used: the contents of files it read, command output, search results.
-- **What stays:** everything Claude never read or ran. The code runs, the files change, and commands execute on the developer's machine.
-- **On big tasks:** the amount sent grows with how much Claude **reads**, not with the size of the project. A 1,000-file project where Claude reads 50 files sends those 50 (or parts of them), not 1,000.
-- **How to control it:** limit what Claude can read and run with permission settings, keep secrets out of files Claude is likely to open, and set these rules centrally for the team.
+**Q30. (Exam angle) A security team asks: "What data leaves our machines when developers use Claude Code?" What do you tell them?**
+- **What leaves:** the messages Claude Code sends to the model. That's the developer's requests, plus the tool results: the files Claude Code read, command output, and search results.
+- **What stays:** everything Claude Code never read. All the code runs, the files change, and the commands execute on the developer's machine.
+- **On big tasks:** the amount sent depends on how much Claude Code **reads**, not on the size of the project. If it reads 50 files in a 1,000-file project, it sends those 50 (or parts of them), not 1,000.
+- **How to control it:** limit what Claude Code can read and run with permission settings, keep secrets out of files it's likely to open, and set these rules for the whole team in one place.
 
 This fits the **Governance, Safety & Risk** exam domain.
 
