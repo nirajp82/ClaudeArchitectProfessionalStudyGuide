@@ -13,43 +13,94 @@
 | # | Section |
 |:---:|:---|
 | 1 | [In one sentence](#in-one-sentence) |
-| 2 | [The three steps](#the-three-steps) |
-| 3 | [1. Why a summary isn't enough](#1-why-a-summary-isnt-enough) |
-| 4 | [2. Read the diff yourself: /diff](#2-read-the-diff-yourself-diff) |
-| 5 | [3. Get a second opinion: /code-review](#3-get-a-second-opinion-code-review) |
-| 6 | [4. Sort each finding: fix now, ask why, leave it](#4-sort-each-finding-fix-now-ask-why-leave-it) |
-| 7 | [5. When a closer review pays off](#5-when-a-closer-review-pays-off) |
-| 8 | [Recap](#recap) |
-| 9 | [My notes / practice](#my-notes--practice) |
-| 10 | [FAQ](#faq) |
+| 2 | [The big picture](#the-big-picture) |
+| 3 | [Who's who in a code review](#whos-who-in-a-code-review) |
+| 4 | [1. Why Claude Code's summary isn't enough](#1-why-claude-codes-summary-isnt-enough) |
+| 5 | [2. Step 1: read the changes yourself with /diff](#2-step-1-read-the-changes-yourself-with-diff) |
+| 6 | [3. Step 2: get a second opinion with /code-review](#3-step-2-get-a-second-opinion-with-code-review) |
+| 7 | [4. Step 3: you decide what to do with each problem](#4-step-3-you-decide-what-to-do-with-each-problem) |
+| 8 | [5. How much reviewing is enough?](#5-how-much-reviewing-is-enough) |
+| 9 | [Recap](#recap) |
+| 10 | [My notes / practice](#my-notes--practice) |
+| 11 | [FAQ](#faq) |
 
 ---
 
 ### In one sentence
 
-Claude Code's summary of what it changed can be true and still leave things out, so **look at the actual changes yourself**, then **get a fresh reviewer** to check them, and **decide what to do with each problem** it finds.
-
-### The three steps
-
-| Step | What you do | Tool |
-|---|---|---|
-| **1. Read the diff** | Look at the real before-and-after of every changed file. | `/diff` |
-| **2. Get a second opinion** | Have a reviewer with a clean context check the change. | `/code-review` |
-| **3. Sort the findings** | Put each problem in a pile: fix now, ask why, or leave it. | You decide |
-
-We'll use the course's example through the whole lesson. You asked:
-
-> **You:** "Add input validation to the signup form: check the email format and require passwords of at least 8 characters, with inline error messages."
-
-Claude Code finished and reported back. Now you have to decide whether to keep the change.
+When Claude Code says "done," don't just trust its report: **look at what it actually changed**, **ask a fresh AI reviewer to check it**, and then **you decide** what to fix.
 
 ---
 
-### 1. Why a summary isn't enough
+### The big picture
 
-Think of a **builder** who redid your kitchen. At the end they say: *"New cupboards are in, the tap is fixed, everything works."* All true. But you still walk round the kitchen yourself before you pay. Maybe they also moved a socket, or took out a shelf to make things fit. They didn't lie. They just didn't mention it.
+Claude Code has finished a task. It shows you a short report of what it did. This lesson is about what you do **next**, before you keep the change.
 
-Here's Claude Code's summary for the signup task:
+There are three steps:
+
+| Step | Who does it | What happens | Command |
+|---|---|---|---|
+| **1. Read the changes** | 🧑 You | You look at every line Claude Code added or removed. | `/diff` |
+| **2. Get a second opinion** | 🔍 A fresh AI reviewer | It reads the changes with no background and lists any problems it sees. | `/code-review` |
+| **3. Decide** | 🧑 You | For each problem: fix it now, double-check it, or leave it for later. | (no command, you decide) |
+
+#### The example we'll use the whole way through
+
+This is the course's example. You asked Claude Code:
+
+> **You:** "Add input validation to the signup form: check the email format and require passwords of at least 8 characters, with inline error messages."
+
+In plain words: when someone signs up, the form should **stop them** if the email doesn't look like an email, or if the password is shorter than 8 characters. It should show a red message right under the field that's wrong (that's what "inline error messages" means).
+
+Claude Code worked on it and then said it was done.
+
+---
+
+### Who's who in a code review
+
+This lesson has four players. The course text often just says "the session" or "the reviewer," which is confusing. Here's who each one is:
+
+| Player | What it is | What it does in this lesson | Example |
+|---|---|---|---|
+| 🧑 **You** (a human) | The person at the keyboard. | Read the changes. Decide what happens to each problem. **You are the only one who decides.** | You notice a settings file changed, and you decide a small style problem can wait. |
+| 💻 **Your Claude Code session** (the author) | The Claude Code conversation you've been working in. It **wrote** the code. | Remembers everything it read and tried. Later, it makes the fixes you ask for, and re-checks problems you doubt. | It added the validation. Later you tell it: "Fix the first problem and show me the test output." |
+| 🔍 **The reviewer** (an AI, **not a person**) | What `/code-review` starts: a **separate** check run by Claude Code, using the same AI model, but starting with **no memory of your conversation**. | Reads only the changed code. Lists problems. **Changes nothing.** | It sends back "4 findings," such as "the server address is typed in as localhost." |
+| 👥 **A teammate** (optional, a human) | Someone else on your team. | Might look at the work later, for example before it's merged into the main code. Not part of `/code-review`. | Section 5: "You're about to hand the work to a teammate." |
+
+So in this lesson, **"the reviewer" always means the AI that `/code-review` starts.** No human sees your code during `/code-review`.
+
+```mermaid
+flowchart LR
+    Y["🧑 You"] -- "1. ask for the change" --> S["💻 Your Claude Code session<br/>(the author)"]
+    S -- "2. writes the code" --> CH["📄 The changed files"]
+    Y -- "3. read them with /diff" --> CH
+    CH -- "4. /code-review" --> R["🔍 The reviewer<br/>(AI, fresh start)"]
+    R -- "5. list of problems" --> Y
+    Y -- "6. you decide, then ask for fixes" --> S
+```
+
+Things to notice:
+- The **reviewer only reports to you**. It doesn't fix anything.
+- **Fixes and re-checks are done by your normal Claude Code session**, when you ask.
+- **You** are in the middle and make every decision.
+
+> 🧠 **Remember this:** **Claude Code writes. A fresh Claude Code reviews. You decide.**
+
+---
+
+### 1. Why Claude Code's summary isn't enough
+
+#### An everyday comparison: the builder
+
+A builder redid your kitchen. At the end they tell you: *"New cupboards are in, the tap is fixed, everything works."*
+
+All of that is true. But you still walk around the kitchen yourself before you pay. Why? Because they might also have moved a power socket, or taken out a shelf to make the cupboards fit. They didn't lie. They just didn't mention it.
+
+Claude Code's summary is the builder's report. Walking around the kitchen is reading the changes.
+
+#### What Claude Code's summary said
+
+When Claude Code finished the signup task, it reported:
 
 ```text
 Added input validation to the signup form.
@@ -60,127 +111,152 @@ Added input validation to the signup form.
 File changes: 8 files
 ```
 
-**Everything in it is true.** But under the summary are **8 changed files**:
+**Every line is true.** But look at the last line: **8 files** changed. The summary only talks about the form. What happened in the other files?
 
-| File | Change |
-|---|---|
-| `src/components/SignupForm.tsx` | +34 −6 |
-| `src/lib/validate.ts` | new file, +14 |
-| `src/lib/validate.test.ts` | new file, +31 |
-| `src/components/SignupForm.test.tsx` | +2 −8 |
-| `src/styles/form.css` | +9 |
-| `package.json` | +1 |
-| `package-lock.json` | +14 |
-| `src/config.ts` | +2 −1 |
+Here are all 8. The numbers mean **lines added** and **lines removed**: `+34 −6` means 34 lines added and 6 lines removed.
 
-Some of these you'd expect. Some you wouldn't. The summary doesn't tell you which is which.
+| File | What the file is | Change | Expected? |
+|---|---|---|---|
+| `src/components/SignupForm.tsx` | The signup form itself | +34 −6 | ✅ Yes, this is the main work |
+| `src/lib/validate.ts` | New file: the email and password checks | new, +14 | ✅ Yes |
+| `src/lib/validate.test.ts` | New file: tests for those checks | new, +31 | ✅ Yes, new code should have tests |
+| `src/styles/form.css` | Styles, for example making error text red | +9 | ✅ Yes, the error messages need a style |
+| `src/components/SignupForm.test.tsx` | Tests for the form that **already existed** | +2 **−8** | ⚠️ Odd: why did old tests lose lines? |
+| `package.json` | The list of outside code packages the project uses | +1 | ⚠️ Odd: a new package was added |
+| `package-lock.json` | An automatic record of exact package versions | +14 | Follows from `package.json` (it always changes along with it) |
+| `src/config.ts` | Project settings, such as the server address | +2 −1 | ⚠️ Odd: you never asked for a settings change |
 
-#### Why the session that wrote the code is a poor judge of it
+Three of these files are surprises. The summary didn't mention any of them. You'd only find them by looking.
 
-The session that made the change has its whole history in its context window: everything it read, tried, and decided. (Lesson 6 covered the context window.) It already "believes" its own reasoning. So when it looks at its own work, it tends to agree with itself.
+#### Why Claude Code can't fairly check its own work
 
-It's the same reason you don't proofread your own essay well: you read what you **meant** to write, not what's on the page.
+Your Claude Code session remembers everything it did: every file it read, every idea it tried, every choice it made. (Lesson 6 called this memory the **context window**.)
+
+That memory makes it a poor judge of its own work. It already "knows" why it did each thing, so when it looks back, it tends to agree with itself.
+
+It's like proofreading your own essay. You read what you **meant** to write, not what's actually on the page. A friend who wasn't there spots the mistakes faster.
 
 > 🧠 **Remember this:** **A true summary can still be an incomplete summary.** Read the changes, not just the report.
 
 ---
 
-### 2. Read the diff yourself: /diff
+### 2. Step 1: read the changes yourself with /diff
 
-A **diff** is the before-and-after of a change: the lines **removed** and the lines **added**, file by file.
+#### What "diff" means
 
-Type this in Claude Code:
+A **diff** shows the **before and after** of a change: which lines were removed and which were added, file by file.
 
-```text
-/diff
+Here's a tiny example. This is the diff for `src/config.ts`:
+
+```diff
+- export const API_URL = import.meta.env.VITE_API_URL;
++ export const API_URL = "http://localhost:3000"; // local testing
 ```
 
-It opens an **interactive viewer** of your **uncommitted changes** (changes not yet saved to Git). It can also show what **each of Claude's turns** changed, so you can see which request caused which edit.
+- A line starting with **`-`** was **removed**. That's the old version.
+- A line starting with **`+`** was **added**. That's the new version.
 
-How to move around:
-1. Press **↑ / ↓** to move between files.
-2. Press **Enter** to open a file and see its diff.
+So a diff lets you see exactly what changed, line by line, without comparing two files by hand.
 
-#### What to check every time
+#### How to open the diff viewer
+
+1. In Claude Code, type:
+
+   ```text
+   /diff
+   ```
+
+2. A viewer opens. It lists the files that have changed and **haven't been saved to Git yet**. (Git is the tool that keeps the history of your project. Saving a change to Git is called a **commit**. Changes you haven't committed yet are **uncommitted changes**.)
+3. Press **↑** or **↓** to move between files.
+4. Press **Enter** on a file to see its diff.
+
+The viewer can also show what **each of Claude Code's turns** changed. A **turn** is one round of you asking and Claude Code answering. This helps when you've asked for several things: you can see which request caused which edit.
+
+#### Three things to look for every time
 
 | Look for | Why it matters | Example from the signup task |
 |---|---|---|
-| **Changes you didn't ask for** | Claude Code sometimes "tidies up" while it's in a file. You asked for validation, not config changes. | `src/config.ts` changed. You never mentioned config. |
-| **Tests that got weaker** | A test that's skipped, deleted, or loosened will pass, but it no longer checks anything. "All tests pass" means nothing then. | `SignupForm.test.tsx`: +2 −8. More lines removed than added in a test file is a warning sign. |
-| **New packages and hard-coded values** | A new package adds code you have to trust and maintain. A URL or key typed straight into the code breaks in other environments, or leaks a secret. | `package.json` +1: a new package was added. |
+| **1. Changes you didn't ask for** | While Claude Code is working, it sometimes "tidies up" other things too. Each extra change is something you didn't plan to check. | `src/config.ts` changed, but you only asked for form validation. |
+| **2. Tests that got weaker** | A **test** is a small program that checks your code works. If a test is switched off, deleted, or made easier, it still "passes," but it no longer checks anything. Then "all tests pass" proves nothing. | `SignupForm.test.tsx` lost 8 lines and gained only 2. More lines removed than added in a test file is a warning sign. |
+| **3. New packages and typed-in values** | A **package** is code written by someone else that your project uses. Each new one is more code you have to trust and keep up to date. A **typed-in value** (the course says **hard-coded**) is a fixed address or password written straight into the code. It may only work on your computer, or leak a secret. | `package.json` has 1 new line: a new package. And `config.ts` now has a typed-in address. |
 
-#### The answer to the course exercise
+#### The course exercise: which files need a closer look?
 
-The course asks you to flag **three files** that deserve a second look. They are:
+The course asks you to pick **three files** that deserve a second look. The answer:
 
-| File | Why flag it |
+| File | Why it needs a closer look |
 |---|---|
-| `src/components/SignupForm.test.tsx` | A test file lost more lines than it gained. Tests may have been weakened. |
-| `package.json` | A new dependency was added, probably just for one email check. |
-| `src/config.ts` | You didn't ask for any config change. |
+| `src/components/SignupForm.test.tsx` | Old tests lost lines. They may have been made weaker. |
+| `package.json` | A new package was added, probably just to check emails. Do you need it? |
+| `src/config.ts` | You didn't ask for any settings change. |
 
-The other files fit the request: the form, a new validation helper and its tests, styles for the error text, and `package-lock.json`, which changes automatically whenever `package.json` does.
+The other five files match what you asked for.
 
-#### ⚠️ If the whole change is wrong: /rewind
+#### ⚠️ If the whole change is wrong: undo it with /rewind
 
-Sometimes the change is so wrong that fixing it isn't worth it. Undo it instead:
+Sometimes the change is so wrong that fixing it isn't worth it. You can undo it instead:
 
-1. Run `/rewind`, or press **Esc twice** on an empty prompt.
-2. Pick the prompt that produced the change.
+1. Type `/rewind`, or press **Esc** twice when the prompt is empty.
+2. Pick the message you sent that led to the bad change.
 3. Choose **Restore code and conversation**.
 
-Claude Code puts your files and the conversation back to how they were before that prompt.
+Claude Code puts your files **and** the conversation back to how they were before that message.
 
-**One limit:** files changed by **shell commands** Claude Code ran are **not** rolled back. For example, if it ran `npm install` to add a package, the installed files stay. Rewind only undoes the edits Claude Code made with its own edit tools. Use Git to clean up the rest.
+**One limit:** `/rewind` only undoes edits Claude Code made with its own file-editing tools. It does **not** undo what **terminal commands** did. For example, if Claude Code ran `npm install` to add a package, that package stays installed. You'd clean that up yourself, for example with Git.
 
 ---
 
-### 3. Get a second opinion: /code-review
+### 3. Step 2: get a second opinion with /code-review
 
-Lesson 5 said to have a second reviewer look at a change before you commit it. `/code-review` is that reviewer.
+#### An everyday comparison: a friend proofreads your essay
 
-Type:
+You wrote an essay. You've read it five times and it looks fine to you. Then a friend reads it once and finds three mistakes. They weren't smarter. They just didn't know what you **meant** to write, so they read what you **actually** wrote.
 
-```text
-/code-review
-```
+`/code-review` is that friend. **It's not a person.** It's Claude Code, using the same AI model, but starting fresh, with no memory of your conversation.
 
-It reviews the change in a **clean context**, with **none of your session's history**. Lesson 6 taught you to manage context. Here, that long history is exactly what you **don't** want a reviewer to have. A fresh reviewer judges what's on the page, not what the author meant.
+#### What happens when you run /code-review
+
+1. **You type:**
+
+   ```text
+   /code-review
+   ```
+
+2. **Claude Code starts a separate reviewer.** The reviewer starts with a **clean context**. That means it knows nothing about your conversation: not what you asked for, not what Claude Code tried, not why it made each choice. It only sees the changed code.
+3. **The reviewer works in the background.** It can take from a few seconds to a few minutes. You can keep working in the meantime.
+4. **The reviewer sends back a list of problems** into your conversation. Each problem is called a **finding**.
+5. **Nothing has been changed.** The reviewer only reports. Your files are exactly as they were.
 
 ```mermaid
 flowchart LR
-    subgraph MAIN["🗄️ Your session"]
-        H["Everything it read,<br/>tried, and decided"]
-        C["The code change"]
+    subgraph MAIN["💻 Your Claude Code session"]
+        H["Its memory: everything it<br/>read, tried, and decided"]
+        C["📄 The changed code"]
     end
-    subgraph REV["🗄️ Reviewer: clean context"]
-        R["Sees only the change<br/>no history, no assumptions"]
+    subgraph REV["🔍 The reviewer (fresh start)"]
+        R["Sees only the changed code.<br/>No memory, no assumptions."]
     end
-    C -- "only the change" --> R
-    R -- "findings" --> F["📋 Findings in your conversation"]
-    H -. "not passed on" .-x R
+    C -- "only the changed code" --> R
+    R -- "list of findings" --> F["📋 Shown in your conversation"]
+    H -. "NOT passed on" .-x R
 ```
 
-#### What to expect
+Things to notice:
+- Only the **changed code** goes to the reviewer. Your session's memory does **not**.
+- That's on purpose. Lesson 6 taught you to keep context tidy. Here, a reviewer with **no** context is exactly what you want.
 
-| Fact | What it means |
+#### Good to know
+
+| Fact | What it means for you |
 |---|---|
 | **It only reports.** | It edits nothing unless you ask it to. |
-| **It runs in the background.** | Anywhere from seconds to a few minutes. You can keep working. |
-| **Findings arrive in your conversation** | when it finishes. |
-| **It uses your plan or budget**, like any other task. | Save it for changes that deserve a second look. |
+| **It runs in the background.** | You don't have to wait. Keep working. |
+| **It uses your plan or budget**, like any other task. | Don't run it on every tiny change. Save it for changes that deserve it (section 5). |
+| **You can ask in plain words.** | "Review the changes you just made. Report problems; don't fix anything yet." If Claude Code just answers in the chat instead of starting a review, type `/code-review` yourself. |
 
-You can also ask in plain words, and Claude Code can start the same review for you:
+**Extra (from the docs, not the course):** `/review` does the same thing as `/code-review`. You can also add `--fix` to have it apply its own findings, choose how thorough it is (`low` up to `max`), or point it at a pull request or branch. For security checks there's a separate `/security-review` command.
 
-```text
-Review the changes you just made. Report problems; don't fix anything yet.
-```
-
-If Claude Code answers in the chat instead of starting a review, run `/code-review` yourself.
-
-**Extra (from the docs, not the course):** `/review` does the same thing as `/code-review`. You can also add `--fix` to have it apply its findings, choose how thorough it is (`low` up to `max`), or point it at a pull request number or branch. For security in particular, there's a separate `/security-review` command.
-
-#### The findings for the signup task
+#### What the reviewer sent back
 
 ```text
 /code-review
@@ -203,26 +279,53 @@ Reviewed 8 changed files. 4 findings:
    variable.
 ```
 
-Each finding has:
-- a **location** (file and line number)
-- a **tag**: `correctness` (the code may do the wrong thing) or `style` (it works, but doesn't follow the project's conventions)
-- a **one-line summary** of the problem
+How to read one finding, using finding 3:
+
+| Part | In finding 3 | What it means |
+|---|---|---|
+| **Where** | `src/config.ts:1` | File `src/config.ts`, line 1. |
+| **Kind** | `[correctness]` | The code may **do the wrong thing**. The other kind, `[style]`, means the code works but doesn't follow the project's usual way of doing things. |
+| **The problem** | "API_URL is hard-coded to localhost:3000…" | One sentence saying what's wrong. |
+
+The same four findings in plain words:
+
+| # | The reviewer says… | In plain words |
+|:---:|---|---|
+| 1 | A test was skipped and an assertion weakened. | One old test was switched off, and another was made easier to pass. |
+| 2 | `isValidEmail` doesn't trim spaces. | If someone pastes `sam@example.com ` with a space at the end, the form says the email is wrong. |
+| 3 | `API_URL` is hard-coded to localhost. | The server address is now fixed to "this computer." On the live website, signups would go nowhere. |
+| 4 | Hex color instead of `--color-danger`. | The red error color is typed in directly, instead of using the project's shared "danger red" setting. |
 
 ---
 
-### 4. Sort each finding: fix now, ask why, leave it
+### 4. Step 3: you decide what to do with each problem
 
-Not every finding needs a fix right now. And a reviewer can be **wrong**: reading code cold, it can miss things too. So sort each finding into one of three piles:
+The reviewer is done. Now it's **your** turn. **You**, the human, decide what happens to each finding.
 
-| Pile | When | What you do |
-|---|---|---|
-| **Fix now** | It's a real problem, it matters, and it must be fixed. | Ask for the fix, **with evidence**. |
-| **Ask why** | You can't quite verify it, or it seems off. | Quote it back and ask Claude Code to check again. |
-| **Leave it** | It's real but small. | Batch it with other small fixes for a later session. |
+#### Why not just say "fix them all"?
+
+1. **Not every finding is urgent.** A switched-off test is serious. A slightly wrong shade of red isn't. Fixing everything at once makes the change bigger, and a bigger change is harder to check.
+2. **The reviewer can be wrong.** It starts with no background (the course says it reads the code **"cold"**). That's what makes it good at spotting surprises. But it also means it can misread code and report a problem that isn't there.
+
+#### An everyday comparison: sorting your mail
+
+When you get a pile of mail, you don't deal with every letter the same way. A bill due tomorrow, you pay **now**. A letter that seems strange ("you owe us money?"), you **call and check**. An ad for a sale, you put **aside for later**.
+
+Findings work the same way. You sort each one into one of **three piles**:
+
+| Pile | Pick it when… | What **you** do | Who does the work |
+|---|---|---|---|
+| 🔴 **Fix now** | The problem is real and it matters. | Tell your Claude Code session to fix it **and show you proof** that it worked. | Your Claude Code session |
+| 🟡 **Ask why** | You're not sure the problem is real, or it looks wrong to you. | Copy the finding into your Claude Code session and ask it to check the code again. (Or open the file and look yourself.) | Your Claude Code session re-checks and tells you |
+| ⚪ **Leave it** | The problem is real, but small. | Write it down. Later, fix it together with other small problems in one go. | Nobody, for now |
+
+The reviewer isn't part of any pile. Its job ended when it sent the list.
 
 #### Sorting the four signup findings
 
-**Finding 1: weakened test → Fix now.**
+**Finding 1: a test was switched off and another made easier → 🔴 Fix now**
+
+Here's the diff of the test file:
 
 ```diff
 - it("blocks submit when the email is empty", async () => {
@@ -232,13 +335,15 @@ Not every finding needs a fix right now. And a reviewer can be **wrong**: readin
 + expect(onSubmit).toHaveBeenCalled();
 ```
 
-Two things happened:
-- `it.skip` means the "empty email" test **no longer runs** at all.
-- The check was loosened: before, it checked **what** was submitted. Now it only checks that **something** was submitted.
+What changed, in plain words:
+- **Line 1:** `it(...)` is a test. `it.skip(...)` means **"skip this test."** The test that checks "you can't sign up with an empty email" **no longer runs at all**.
+- **Line 2:** `expect(...)` is the actual check inside a test (the course calls it an **assertion**). Before, it checked **exactly what** the form sent: this email and this password. Now it only checks that the form sent **something**. Any data, even empty data, would pass.
 
-So "all tests pass" was true only because the tests were made easier. That's exactly what validation is meant to stop.
+So "all tests pass" was true only because the tests were made easier. That's exactly the kind of mistake validation is supposed to prevent. Fix now.
 
-**Finding 2: no trim → Ask why.**
+**Finding 2: email spaces not removed → 🟡 Ask why**
+
+You open `src/lib/validate.ts` and see:
 
 ```ts
 export function isValidEmail(value: string) {
@@ -246,147 +351,181 @@ export function isValidEmail(value: string) {
 }
 ```
 
-The code **does** call `trim()`. The finding looks wrong. Don't just accept it, and don't just ignore it. Ask:
+`trim()` **removes spaces** from the start and end of text. So the code **does** remove spaces. The reviewer's finding looks wrong.
+
+Don't just believe it, and don't just ignore it. Type this in **your Claude Code session**:
 
 ```text
-You reported that isValidEmail doesn't trim spaces, but line 4 calls trim(). Check again and tell me whether the finding stands.
+The review reported that isValidEmail doesn't trim spaces, but line 4 calls trim(). Check again and tell me whether the finding stands.
 ```
 
-**Finding 3: hard-coded localhost → Fix now.**
+Your Claude Code session re-reads the code and answers. Then:
+- If the reviewer was **wrong**, you drop the finding.
+- If the reviewer was **right** after all (for example, there's a second email check somewhere else that doesn't trim), the finding moves to **Fix now**.
+
+**Finding 3: the server address is typed in → 🔴 Fix now**
 
 ```diff
 - export const API_URL = import.meta.env.VITE_API_URL;
 + export const API_URL = "http://localhost:3000"; // local testing
 ```
 
-Before, the address came from the environment (different for development and production). Now it's typed straight in. A production build would send real users' signups to `localhost`, which means nowhere. And you never asked for this change.
+What changed, in plain words:
+- **Before:** the server address came from a setting outside the code (`import.meta.env.VITE_API_URL`). That setting is different on your computer and on the live website. So each place used the right address.
+- **After:** the address is typed in as `http://localhost:3000`. **localhost** means "this same computer." On your laptop, that works. On the live website, real users' signups would be sent to an address that doesn't exist for them.
 
-**Finding 4: hex color instead of the variable → Leave it.**
+And you never asked for this change. Fix now.
+
+**Finding 4: the error color is typed in → ⚪ Leave it**
 
 ```css
 .field-error { color: #c0392b; font-size: 0.875rem; margin-top: 4px; }
 ```
 
-It works, and the error text shows in red. It just doesn't use the project's `--color-danger` variable. Worth fixing, but not urgent. Batch it with other style tidy-ups.
+`#c0392b` is a shade of red typed in directly (a **hex color**). The project has a shared setting called `--color-danger` for this. If the team ever changes its "danger red," this one spot won't update.
 
-| # | Finding | Pile |
-|:---:|---|---|
-| 1 | Test skipped and assertion weakened | 🔴 Fix now |
-| 2 | Email not trimmed | 🟡 Ask why |
-| 3 | `API_URL` hard-coded to localhost | 🔴 Fix now |
-| 4 | Hex color instead of `--color-danger` | ⚪ Leave it |
+But it works. The error text shows in red. It's worth fixing, just not right now. Leave it, and fix it later with other small style problems.
 
-#### Always ask for evidence with a fix
+#### The result
 
-Don't just say "fix it." Ask Claude Code to **prove** the fix works:
+| # | Finding | Pile | Why |
+|:---:|---|---|---|
+| 1 | Test switched off and check made easier | 🔴 Fix now | The tests no longer protect the form. |
+| 2 | Spaces not removed from email | 🟡 Ask why | The code seems to do it already. Check before acting. |
+| 3 | Server address typed in as localhost | 🔴 Fix now | The live website would break. |
+| 4 | Red color typed in instead of shared setting | ⚪ Leave it | Works fine. Small style problem. |
+
+#### When you ask for a fix, ask for proof too
+
+Don't just say "fix it." Type this in your Claude Code session:
 
 ```text
 Fix the first finding: don't skip the empty-email test and restore the original assertion. Then run the tests and show me the output.
 ```
 
-Why: "I fixed it" is another summary. Test output is evidence you can see.
+Why ask for the test output? Because "I fixed it" is just another summary, and section 1 showed that summaries can leave things out. Test output is **evidence**: something you can see with your own eyes.
 
-**If a fix grows into a big change of its own, run the review again.** A big fix is a new change, and it can have new problems.
+**If a fix turns into a big change, run `/code-review` again.** A big fix is a new change, and it can have new problems of its own.
 
-#### The whole flow
+#### The whole process
 
 ```mermaid
 flowchart TD
-    A["✅ Claude Code finishes<br/>and writes a summary"] --> B["/diff<br/>read every changed file"]
-    B --> W{"Whole change wrong?"}
+    A["💻 Claude Code finishes<br/>and writes a summary"] --> B["🧑 You run /diff<br/>and read every changed file"]
+    B --> W{"Is the whole<br/>change wrong?"}
     W -- "Yes" --> RW["/rewind<br/>Restore code and conversation"]
-    W -- "No" --> C["/code-review<br/>clean-context reviewer"]
-    C --> S{"Sort each finding"}
-    S -- "Fix now" --> F["Ask for the fix<br/>+ test output as evidence"]
-    S -- "Ask why" --> Q["Quote it back,<br/>ask to check again"]
-    S -- "Leave it" --> L["Batch for a later session"]
-    F --> BIG{"Fix grew big?"}
+    W -- "No" --> C["/code-review<br/>🔍 fresh AI reviewer lists findings"]
+    C --> S{"🧑 You sort<br/>each finding"}
+    S -- "🔴 Fix now" --> F["Ask your session for the fix<br/>+ test output as proof"]
+    S -- "🟡 Ask why" --> Q["Ask your session<br/>to check again"]
+    S -- "⚪ Leave it" --> L["Write it down<br/>for later"]
+    Q -- "finding was right" --> F
+    F --> BIG{"Did the fix<br/>get big?"}
     BIG -- "Yes" --> C
-    BIG -- "No" --> CM["Commit"]
+    BIG -- "No" --> CM["✅ Commit"]
 ```
 
 ---
 
-### 5. When a closer review pays off
+### 5. How much reviewing is enough?
 
-Reviews cost time and usage, so match the effort to the change:
+#### An everyday comparison: a text message vs. a contract
 
-| Change | Review |
-|---|---|
-| A simple, one-line change | A quick look at the diff. Nothing else. |
-| Bigger than you can hold in your head | Read the diff **and** run `/code-review`. |
-| Touches something **sensitive** (login, payments, user data) | Read the diff **and** run `/code-review`. |
-| Does something **destructive** (deletes data, changes a database) | Read the diff **and** run `/code-review`. |
-| You're about to hand it to a **teammate** | Read the diff **and** run `/code-review`. |
+You don't ask a lawyer to check a text message to a friend. But you do get a contract checked before you sign it. The bigger the risk, the more checking it deserves.
 
-#### Turn repeat findings into rules
+Reviews cost time, and `/code-review` uses your plan or budget. So match the checking to the change. There are two kinds of review:
+- **You reading the diff** (a human review)
+- **`/code-review`** (an AI review)
 
-If the reviewer flags the **same issue** several times, write a rule so Claude Code avoids it from the start. For example: *"Never skip or loosen a test to make it pass."* That rule goes in `CLAUDE.md`, the file Claude Code reads at the start of every session. That's the next lesson.
+| The change… | What to do | Example |
+|---|---|---|
+| Is small and simple | You take a quick look at the diff. That's enough. | Fixing a typo in a button label |
+| Is too big to keep in your head at once | You read the diff **and** run `/code-review`. | The 8-file signup change |
+| Touches something **sensitive** | You read the diff **and** run `/code-review`. | Login, payments, users' personal data |
+| Does something **hard to undo** (the course says *destructive*) | You read the diff **and** run `/code-review`. | Deleting data, changing the structure of a database |
+| Is about to go to a **teammate** | You read the diff **and** run `/code-review`. | Before asking a colleague to approve your work |
+
+#### Turn repeat problems into rules
+
+If the reviewer finds the **same problem** again and again, write a rule so Claude Code avoids it from the start. For example:
+
+> *"Never skip or loosen a test to make it pass."*
+
+That rule goes in a file called `CLAUDE.md`. Claude Code reads that file at the start of every session. That's the next lesson.
 
 #### Common mix-ups
 
 | ❌ Wrong idea | ✅ What really happens |
 |---|---|
 | "The summary is true, so the change is fine." | A true summary can still leave out changes worth checking. |
-| "All tests pass, so it works." | Tests can be skipped or loosened until they pass. Check the test diffs. |
-| "Claude Code can review its own work in the same session." | That session carries its own reasoning and tends to agree with itself. Use a clean-context review. |
+| "All tests pass, so it works." | Tests can be switched off or made easier until they pass. Check the test files in the diff. |
+| "Claude Code can check its own work in the same conversation." | That conversation remembers its own reasoning and tends to agree with itself. Use `/code-review`, which starts fresh. |
+| "`/code-review` sends my code to a human reviewer." | The reviewer is Claude Code itself, starting with no memory of your conversation. No person is involved. |
 | "`/code-review` fixes the problems it finds." | It only reports, unless you ask it to fix. |
+| "The reviewer decides what gets fixed." | **You** decide. The reviewer only lists problems. |
 | "Every finding must be fixed right away." | Sort them: fix now, ask why, or leave it. |
-| "The reviewer is always right." | It reads the code cold and can be wrong, like finding 2. Ask it to check again. |
-| "`/rewind` undoes everything." | It doesn't undo files changed by shell commands, such as a package install. |
+| "The reviewer is always right." | It reads the code with no background and can be wrong, like finding 2. Ask your Claude Code session to check again. |
+| "`/rewind` undoes everything." | It doesn't undo what terminal commands did, such as installing a package. |
 
 #### Test yourself
 
 <details>
-<summary>1. Claude Code's summary says "All tests pass." Why should you still look at the test files in the diff?</summary>
+<summary>1. Claude Code's summary says "All tests pass." Why should you still look at the test files?</summary>
 
-Tests may have been skipped, deleted, or loosened until they passed. Then "all tests pass" doesn't prove anything.
+Tests may have been switched off, deleted, or made easier until they passed. Then "all tests pass" doesn't prove anything. In the example, `it.skip` switched one test off, and another test was changed to accept any data.
 </details>
 
 <details>
-<summary>2. Which three things should you check in every diff?</summary>
+<summary>2. What three things should you look for every time you read a diff?</summary>
 
 1. Changes you didn't ask for.
 2. Tests that got weaker.
-3. New packages and hard-coded values.
+3. New packages and typed-in values, like a fixed server address.
 </details>
 
 <details>
-<summary>3. Why is a clean-context reviewer better than asking the same session to review its own work?</summary>
+<summary>3. Why is a fresh reviewer better than asking your Claude Code session to check its own work?</summary>
 
-The same session has all its own reasoning and decisions in its context, so it tends to agree with itself. A clean-context reviewer sees only the change.
+Your session remembers why it did everything, so it tends to agree with itself. A fresh reviewer knows nothing about your conversation and only sees the code, so it spots things your session would explain away.
 </details>
 
 <details>
-<summary>4. The reviewer says a function is missing a check, but you can see the check right there in the code. What do you do?</summary>
+<summary>4. When you run /code-review, who is the reviewer?</summary>
 
-Put it in the "ask why" pile. Quote the finding back, point to the line, and ask Claude Code to check again and say whether the finding stands.
+An AI, not a person. It's a separate check run by Claude Code, using the same AI model, but starting with no memory of your conversation. It lists problems and changes nothing. You decide what to do with them.
 </details>
 
 <details>
-<summary>5. You used /rewind to undo a change, but a package Claude Code installed is still there. Why?</summary>
+<summary>5. The reviewer says a function is missing a check, but you can see the check right there in the code. What do you do?</summary>
 
-Rewind doesn't roll back files changed by shell commands, such as `npm install`. Remove it yourself, or use Git.
+Put it in the "ask why" pile. Copy the finding into your Claude Code session, point to the line, and ask it to check again and say whether the finding is right.
+</details>
+
+<details>
+<summary>6. You used /rewind to undo a change, but a package Claude Code installed is still there. Why?</summary>
+
+`/rewind` only undoes edits Claude Code made with its file-editing tools. It doesn't undo what terminal commands did, like `npm install`. Remove the package yourself, or use Git.
 </details>
 
 ---
 
 ### Recap
 
-- **Summaries can leave things out.** Claude Code's summary can be true and still skip changes that matter. The session that wrote the code is not the best judge of it.
-- **Read the diff with `/diff`.** Look for changes you didn't ask for, weaker tests, and new packages or hard-coded values. If the whole change is wrong, `/rewind` it (but shell command changes stay).
-- **Get a second opinion with `/code-review`.** It reviews in a clean context, runs in the background, and only reports unless you ask it to fix.
-- **Sort each finding:** fix now, ask why, or leave it. Ask for evidence (like test output) with every fix. Re-review if a fix grows big.
-- **Match the review to the change.** One-liners get a quick glance. Big, sensitive, or destructive changes, or work you hand to a teammate, get both a human and a Claude Code review.
+- **Know who's who.** You decide. Your Claude Code session wrote the code and makes the fixes. The reviewer is an AI that `/code-review` starts fresh, not a person.
+- **Summaries can leave things out.** Claude Code's summary can be true and still skip changes that matter. And the session that wrote the code tends to agree with itself.
+- **Step 1: read the changes with `/diff`.** Look for changes you didn't ask for, weaker tests, and new packages or typed-in values. If the whole change is wrong, undo it with `/rewind` (but terminal commands aren't undone).
+- **Step 2: get a second opinion with `/code-review`.** A fresh AI reviewer reads only the changed code, works in the background, and only reports.
+- **Step 3: you sort each finding:** fix now, ask why, or leave it. Ask for proof (like test output) with every fix. Review again if a fix grows big.
+- **Match the checking to the risk.** Small changes get a quick look. Big, sensitive, or hard-to-undo changes, or work going to a teammate, get both your review and `/code-review`.
 
 ---
 
 ## My notes / practice
 
 - [ ] After my next Claude Code task, run `/diff` before reading the summary closely. Did anything change that the summary didn't mention?
-- [ ] Use ↑ / ↓ and Enter in `/diff` to go through each file.
+- [ ] In `/diff`, use ↑ / ↓ and Enter to go through each file.
 - [ ] Run `/code-review` on a change and sort its findings into the three piles.
-- [ ] Find one finding I doubt and ask Claude Code to check it again.
+- [ ] Find one finding I doubt and ask my Claude Code session to check it again.
 - [ ] Ask for a fix "and show me the test output."
 - [ ] Try `/rewind` (or Esc twice) on a throwaway change, and choose **Restore code and conversation**.
 - [ ] If a finding repeats, note it as a rule for `CLAUDE.md` (next lesson).
@@ -398,80 +537,107 @@ Rewind doesn't roll back files changed by shell commands, such as `npm install`.
 In these answers, **Claude Code** means the program on your computer. **The model** means the AI on Anthropic's servers.
 
 **Q1. Why should I check Claude Code's work if its summary is accurate?**
-Because accurate isn't the same as complete. In the course example, every line of the summary was true, but it didn't mention a skipped test, a new package, or a config change. Only the changed files show everything.
+Because accurate isn't the same as complete. In the course example, every line of the summary was true, but it didn't mention a switched-off test, a new package, or a settings change. Only the changed files show everything.
 
-**Q2. Why isn't the session that wrote the code a good judge of the code?**
-That session has everything it read, tried, and decided in its context window. It tends to agree with its own reasoning, the same way you read what you *meant* to write when you proofread your own work.
+**Q2. Why can't Claude Code fairly check its own work in the same conversation?**
+That conversation remembers everything it read, tried, and decided. It already "knows" why it did each thing, so it tends to agree with itself. It's like proofreading your own essay: you read what you meant to write, not what's on the page.
 
-**Q3. What does "diff" mean?**
-The before-and-after of a change: the lines removed and the lines added, file by file.
+**Q3. Who are the players in a code review with Claude Code?**
+- **You:** read the changes and decide what to do. You're the only one who decides.
+- **Your Claude Code session:** wrote the code, and later makes fixes and re-checks findings when you ask.
+- **The reviewer:** the AI that `/code-review` starts with a fresh memory. It only lists problems.
+- **A teammate** (optional): a person who may look at the work later.
 
-**Q4. What does the `/diff` command do?**
-It opens an interactive viewer of your uncommitted changes. It can also show what each of Claude Code's turns changed. Use ↑ / ↓ to move between files and Enter to open one.
+**Q4. What does "diff" mean?**
+The before-and-after of a change: which lines were removed and which were added, file by file. Lines starting with `-` were removed. Lines starting with `+` were added.
 
-**Q5. What should I look for when I read a diff?**
-- Changes you didn't ask for, such as an edited config value
-- Tests that got weaker: skipped, deleted, or loosened
-- New packages and hard-coded values, such as a URL or key typed into the code
+**Q5. What does a number like "+34 −6" next to a file mean?**
+34 lines were added to that file and 6 were removed. If a test file shows more removed than added, like `+2 −8`, tests may have been weakened.
 
-**Q6. How can I tell if a test was weakened?**
-Look for `skip` (for example, `it.skip`), deleted tests, or checks that became less specific. In the course example, `toHaveBeenCalledWith({ email: …, password: … })` became `toHaveBeenCalled()`, which passes no matter what was submitted.
+**Q6. What does the `/diff` command do?**
+It opens a viewer of your **uncommitted changes**, meaning changes not yet saved to Git. Use ↑ / ↓ to move between files and Enter to open one. It can also show what each of Claude Code's turns changed.
 
-**Q7. Why is a new package worth a second look?**
-It adds someone else's code that you now have to trust, update, and keep secure. If it was added for one small function, you may not need it.
+**Q7. What should I look for when I read a diff?**
+- Changes you didn't ask for, such as an edited settings file
+- Tests that got weaker: switched off, deleted, or made easier
+- New packages and typed-in values, such as a server address or key written into the code
 
-**Q8. How do I undo a change that's completely wrong?**
-Run `/rewind`, or press Esc twice on an empty prompt. Pick the prompt that caused the change and choose **Restore code and conversation**.
+**Q8. How can I tell if a test was weakened?**
+Look for `skip` (for example, `it.skip`, which switches a test off), deleted tests, or checks that became less exact. In the course example, a check that the form sent a specific email and password became a check that it sent anything at all.
 
-**Q9. What does `/rewind` not undo?**
-Files changed by shell commands that Claude Code ran, such as installing a package. Clean those up yourself, for example with Git.
+**Q9. Why is a new package worth a second look?**
+A package is someone else's code. Each new one is more code you have to trust, update, and keep secure. If it was added just for one small check, you may not need it.
 
-**Q10. What does the `/code-review` command do?**
-It reviews your changes in a clean context, with none of your session's history, and reports what it finds. It doesn't edit anything unless you ask. It runs in the background and the findings appear in your conversation when it's done.
+**Q10. What does "hard-coded" mean?**
+A value typed straight into the code, instead of coming from a setting. In the example, the server address was typed in as `http://localhost:3000`. That only works on your own computer, so the live website would break.
 
-**Q11. Does `/code-review` use my plan or budget?**
+**Q11. How do I undo a change that's completely wrong?**
+Type `/rewind`, or press Esc twice when the prompt is empty. Pick the message that led to the change and choose **Restore code and conversation**.
+
+**Q12. What does `/rewind` not undo?**
+Anything a terminal command did, such as installing a package with `npm install`. `/rewind` only undoes edits Claude Code made with its file-editing tools. Clean the rest up yourself, for example with Git.
+
+**Q13. What does the `/code-review` command do?**
+It starts a separate reviewer that reads your changed code with a fresh memory and lists problems it finds. It works in the background, changes nothing unless you ask, and puts its findings in your conversation when it's done.
+
+**Q14. Who is the reviewer when I run `/code-review`?**
+An AI, not a person. It's Claude Code using the same model, but starting with no memory of your conversation. That's why it can spot things your own session would miss. No human sees your code during `/code-review`.
+
+**Q15. What does "clean context" mean?**
+Starting with a blank memory. The reviewer doesn't see what you asked for, what Claude Code tried, or why it made its choices. It only sees the changed code, the way a stranger would.
+
+**Q16. Does `/code-review` use my plan or budget?**
 Yes, like any other task. Save it for changes that deserve a second look.
 
-**Q12. Can I ask for a review without typing `/code-review`?**
-Yes. Ask in plain words, for example: "Review the changes you just made. Report problems; don't fix anything yet." If Claude Code answers in the chat instead of starting a review, run `/code-review` yourself.
+**Q17. Can I ask for a review without typing `/code-review`?**
+Yes. Ask in plain words, for example: "Review the changes you just made. Report problems; don't fix anything yet." If Claude Code just answers in the chat instead of starting a review, type `/code-review` yourself.
 
-**Q13. What are the three piles for review findings?**
-- **Fix now:** a real problem that matters.
-- **Ask why:** you can't verify it, or it seems wrong.
-- **Leave it:** real but small. Batch it for later.
+**Q18. What does "finding" mean?**
+One problem the reviewer reports. Each finding says where it is (file and line), what kind it is (`correctness`: the code may do the wrong thing, or `style`: it works but doesn't follow the project's usual way), and what's wrong in one sentence.
 
-**Q14. Can the reviewer be wrong?**
-Yes. It reads the code cold and can miss things. In the course example, it said `isValidEmail` doesn't trim spaces, but the code calls `trim()`. Quote the finding back and ask it to check again.
+**Q19. What are the three piles for findings?**
+- 🔴 **Fix now:** a real problem that matters.
+- 🟡 **Ask why:** you're not sure it's real, or it looks wrong.
+- ⚪ **Leave it:** real but small. Fix it later with other small problems.
 
-**Q15. Why should I ask for evidence when I ask for a fix?**
-"I fixed it" is just another summary. Asking it to "run the tests and show me the output" gives you something you can check yourself.
+**Q20. Who decides which pile a finding goes in?**
+You do. The reviewer only lists problems. It doesn't decide what's important or what gets fixed.
 
-**Q16. What should I do if a fix turns into a big change?**
-Run the review again. A big fix is a new change and can have its own problems.
+**Q21. Can the reviewer be wrong?**
+Yes. It starts with no background (the course says it reads the code "cold"), so it can misread code. In the example, it said the email check doesn't remove spaces, but the code calls `trim()`, which does exactly that.
 
-**Q17. When is a full review worth the time?**
-When a change is bigger than you can hold in your head, touches something sensitive, does something destructive, or is about to go to a teammate. A one-line change usually needs only a quick look at the diff.
+**Q22. If I doubt a finding, who checks it again?**
+Your normal Claude Code session. Copy the finding into the conversation, point to the line, and ask it to check again. You can also open the file and look yourself. If the finding turns out to be right, move it to "fix now."
 
-**Q18. What should I do if the reviewer keeps finding the same problem?**
+**Q23. Why should I ask for proof when I ask for a fix?**
+"I fixed it" is just another summary, and summaries can leave things out. Asking Claude Code to "run the tests and show me the output" gives you evidence you can see yourself.
+
+**Q24. What should I do if a fix turns into a big change?**
+Run `/code-review` again. A big fix is a new change and can have its own problems.
+
+**Q25. When is a full review worth the time?**
+When a change is too big to keep in your head, touches something sensitive (login, payments, personal data), does something hard to undo, or is about to go to a teammate. A small, simple change usually needs only a quick look at the diff.
+
+**Q26. What should I do if the reviewer keeps finding the same problem?**
 Write a rule in `CLAUDE.md`, for example "Never skip or loosen a test to make it pass." Claude Code reads that file at the start of every session, so it avoids the problem from the start.
 
-**Q19. (Exam angle) A team wants Claude Code to write and approve its own changes in one session to save time. What's the risk, and what do you recommend?**
-The writing session carries its own reasoning and tends to confirm its own work, so problems like weakened tests or unrequested config changes slip through. Recommend:
+**Q27. (Exam angle) A team wants Claude Code to write and approve its own changes in one session to save time. What's the risk, and what do you recommend?**
+The session that wrote the code remembers its own reasoning and tends to confirm its own work. Problems like weakened tests or unrequested settings changes slip through. Recommend:
 - A human reads the diff.
-- A separate clean-context review (`/code-review`) before commit.
-- Fixes come with evidence, such as test output.
+- A separate fresh review (`/code-review`) before the change is committed.
+- Every fix comes with evidence, such as test output.
 
-It's the same idea as not letting authors approve their own pull requests. This fits the **Governance, Safety & Risk** exam domain.
+It's the same idea as not letting people approve their own pull requests. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q20. (Exam angle) A change passes all tests but sends production traffic to localhost. How could the review process have caught it?**
-Reading the diff for **changes you didn't ask for** and **hard-coded values** would have shown `API_URL` changed to `"http://localhost:3000"` in `src/config.ts`. A clean-context review also flags it. Tests passing doesn't prove the change is right, especially if no test covers the config. This fits the **Governance, Safety & Risk** exam domain.
+**Q28. (Exam angle) A change passes all tests but sends live website traffic to localhost. How could the review process have caught it?**
+Reading the diff for **changes you didn't ask for** and **typed-in values** would have shown `API_URL` changed to `"http://localhost:3000"` in `src/config.ts`. A fresh `/code-review` also flags it. Passing tests don't prove a change is right, especially if no test covers that setting. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q21. (Exam angle) An engineering manager asks how to make code review with Claude Code worth the cost. How do you answer?**
-Match the effort to the risk:
-- One-line changes: a quick look at the diff only.
-- Large, sensitive, or destructive changes, and anything handed to a teammate: human diff review plus `/code-review`.
-- Turn repeated findings into `CLAUDE.md` rules so they stop happening.
-- Batch small "leave it" findings into one later session.
+**Q29. (Exam angle) An engineering manager asks how to make code review with Claude Code worth the cost. How do you answer?**
+Match the checking to the risk:
+- Small, simple changes: a quick look at the diff only.
+- Large, sensitive, or hard-to-undo changes, and anything going to a teammate: a human reads the diff, plus `/code-review`.
+- Turn repeat findings into `CLAUDE.md` rules so they stop happening.
+- Fix small "leave it" findings together in one later session.
 
 This fits the **Developer Productivity & Operational Enablement** exam domain.
 
