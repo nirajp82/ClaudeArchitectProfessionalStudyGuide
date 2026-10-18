@@ -98,6 +98,22 @@ Every lesson ends with an FAQ. Lesson 2's FAQ is the model.
 - Order the questions to follow the lesson.
 - End with **2–3 `(Exam angle)` questions** that link the lesson to an exam domain, such as **Governance, Safety & Risk**. Frame them as a real scenario: "A security team asks… How do you answer?"
 
+### How to word a question
+
+These rules apply to FAQ questions **and** "Test yourself" questions. Write each question the way a beginner would ask it out loud.
+
+| Rule | ❌ Don't | ✅ Do |
+|---|---|---|
+| Asking about a term? Put the term in quotes. | What is a tool call? (reads like "What is the tool called?") | What does "tool call" mean? |
+| Name the thing. Never use a vague "it." | How do I install and open it in VS Code? | How do I install and open Claude Code in VS Code? |
+| Short, everyday words, one thing per question. | Could the model delete my files directly? | Can the model delete my files? |
+| No jargon in the question unless it's the term being asked about. | Why doesn't Claude Code load my whole codebase into context? | Why doesn't Claude Code read my whole project at the start? |
+| No idioms. | What's the catch with Homebrew? | What's the downside of installing with Homebrew? |
+| It must be a real question. | Give examples of tasks Claude Code can do. | What kinds of tasks can Claude Code do? |
+| Same names everywhere: **Claude Code** = the program on my computer, **the model** = the AI on Anthropic's servers. Never just "Claude." | Does the model see a file Claude never opened? | Can the model see a file that Claude Code never opened? |
+
+**Before finishing:** read every question on its own, out of context, and check it against this table. If a question could be misread, or needs the lesson to make sense, rewrite it.
+
 ---
 
 ## 6. File layout and lesson template
