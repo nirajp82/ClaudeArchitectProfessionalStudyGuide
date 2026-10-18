@@ -13,8 +13,8 @@ Every lesson is one notes file directly in this folder, named `0X-lesson-name.md
 | 1 | What is Claude Code? | What is Claude Code? | [01-what-is-claude-code.md](01-what-is-claude-code.md) | ✅ Done |
 | 2 | What is Claude Code? | How Claude Code works | [02-how-claude-code-works.md](02-how-claude-code-works.md) | ✅ Done |
 | 3 | Your first prompt | Installing Claude Code | [03-installing-claude-code.md](03-installing-claude-code.md) | ✅ Done |
-| 4 | Your first prompt | Your first prompt | `04-your-first-prompt.md` | ⬜ |
-| 5 | Daily workflows | The explore → plan → code → commit workflow | `05-explore-plan-code-commit.md` | ⬜ |
+| 4 | Your first prompt | Your first prompt | [04-your-first-prompt.md](04-your-first-prompt.md) | ✅ Done |
+| 5 | Daily workflows | The explore → plan → code → commit workflow | [05-explore-plan-code-commit.md](05-explore-plan-code-commit.md) | ✅ Done |
 | 6 | Daily workflows | Context management | `06-context-management.md` | ⬜ |
 | 7 | Daily workflows | Code review | `07-code-review.md` | ⬜ |
 | 8 | Customizing Claude Code | The CLAUDE.md file | `08-claude-md-file.md` | ⬜ |
@@ -42,7 +42,9 @@ Files are created as each lesson is completed. Paste the transcript after each l
   - Lesson 3: JetBrains plugin page → `images/03-jetbrains-plugin.png`
   - Lesson 3: Desktop "Code" view → `images/03-desktop-code-view.png`
   - Lesson 3: claude.ai/code repo selection → `images/03-web-repo-selection.png`
-
+  - Lesson 4: auto-accept mode working through a task → `images/04-auto-accept-mode.png`
+  - Lesson 4: plan mode status bar indicator → `images/04-plan-mode-indicator.png`
+  - Lesson 4: dark mode prompt typed in plan mode → `images/04-dark-mode-prompt.png`
 ## When you finish this course
 
 1. [ ] Take the **course quiz**. Record every missed or guessed question, and the correct reasoning, in `13-course-quiz-review.md`.
