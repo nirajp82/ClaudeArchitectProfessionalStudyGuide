@@ -137,7 +137,7 @@ For the "forgot password" task, after compaction:
 | "Tests for the reset link are still failing." | The exact wording of an error from an hour ago |
 | Your `CLAUDE.md` (re-read from disk) | Small details that didn't make it into the summary |
 
-The official docs add two useful details (not in the course):
+**Notes:**
 - After compacting, Claude Code **re-reads your project's `CLAUDE.md`** from disk. So your project rules always survive.
 - It also re-reads **up to five** of the files it recently read or edited, so it can carry on without searching again.
 
