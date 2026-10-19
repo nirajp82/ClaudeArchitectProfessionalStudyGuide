@@ -57,11 +57,28 @@ journal-app/                 ← the project folder (the "root")
 └── db/schema.ts             ← what the database tables look like
 ```
 
-It's built with **Next.js 15** (the framework the site is built in), **Tailwind** (for colors and spacing), **Drizzle ORM** (for talking to the database), and **pnpm** (the tool that runs commands like `pnpm test`; other projects use `npm`).
+You don't need to know these tools. Just know each project picks its own:
 
-A page can save data in two common ways: **API routes** (separate files under `app/api/` that act like a small web address the page calls) or **server actions** (functions, like those in `app/actions.ts`, that the page calls directly). **This project uses server actions.** Claude Code can't know that unless someone tells it.
+| Tool | What it does | Everyday comparison |
+|---|---|---|
+| **Next.js 15** | The framework the website is built with | The brand of kit the house is built from |
+| **Tailwind** | Sets colors, sizes, and spacing on pages | The paint and furniture style |
+| **Drizzle ORM** | Lets the code read and write the database | The filing clerk who fetches and stores records |
+| **pnpm** | Runs commands like `pnpm test` (other projects use `npm` or `yarn`) | Which remote control the TV uses |
 
-> 💡 **You've already seen one.** This study repo has `ClaudeArchitectStudyGuide/CLAUDE.md`. It tells Claude Code how to format these notes, which is why every lesson has the same layout.
+#### The one rule Claude Code can't guess
+
+In this kind of app, there are **two common ways to save or delete data**. Both work. The team simply picked one:
+
+| | ❌ API route (a common choice, **not** this project's) | ✅ Server action (**this project's** choice) |
+|---|---|---|
+| **What it is** | A separate file that works like a small web address. The page sends a request to that address. | A function the page calls directly by name. |
+| **Where Claude Code would put "delete entry"** | A **new file**: `app/api/entries/delete/route.ts` | A **new function** `deleteEntry` in the **existing** file `app/actions.ts` |
+| **Everyday comparison** | Phoning the shop's order line | Telling the shop assistant standing next to you |
+
+Think of a café that only takes card. Cash works at most cafés, so a new staff member would accept it, unless someone told them "card only." Server actions are this project's "card only" rule. Nothing in the code makes it obvious, so Claude Code would likely guess API routes, the more common choice. **That's exactly the kind of rule that belongs in `CLAUDE.md`.**
+
+> 💡 **You've already seen one.** This study repo has its own: `ClaudeArchitectStudyGuide/CLAUDE.md`. It holds rules like "every lesson ends with an FAQ" and "define every technical term the first time." Claude Code reads it every time it starts in this folder, which is why every lesson has the same layout without anyone explaining it again.
 
 ---
 
