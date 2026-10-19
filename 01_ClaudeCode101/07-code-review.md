@@ -217,7 +217,34 @@ Sort them like your mail: a bill due tomorrow you pay **now**; a strange letter 
 | 🟡 **Ask why** | You're not sure it's real. | Copy the finding into your Claude Code session and ask it to check again (or look yourself). | Your Claude Code session |
 | ⚪ **Leave it** | Real, but small. | Write it down; fix it later with other small problems (the course calls this **batching**). | Nobody, for now |
 
-#### Sorting the four signup findings
+#### How to sort: two questions per finding
+
+There's no button or command for this. You read each finding and ask yourself:
+
+1. **Is the problem real?** Open the file at the line the finding names (`src/lib/validate.ts:4` = line 4), in `/diff` or your editor, and look yourself.
+   - Not sure, or the code seems to say otherwise → 🟡 **Ask why**
+2. **If it's real, does it matter?** Would it break how the app works, lose or leak data, weaken tests, or affect real users?
+   - Yes → 🔴 **Fix now**
+   - No, it's cosmetic or style → ⚪ **Leave it**
+
+| # | Is it real? | Does it matter? | Pile |
+|:---:|---|---|---|
+| 1 | Yes: the diff shows `it.skip` | Yes: tests no longer protect the form | 🔴 Fix now |
+| 2 | Not sure: line 4 calls `trim()` | — | 🟡 Ask why |
+| 3 | Yes: the diff shows `localhost` | Yes: the live site would break | 🔴 Fix now |
+| 4 | Yes: the color is typed in | No: it still shows red | ⚪ Leave it |
+
+Then act on all your decisions with **one message** in your Claude Code session:
+
+```text
+Fix findings 1 and 3, then run the tests and show me the output.
+For finding 2: line 4 already calls trim(). Check again and tell me if the finding stands.
+Skip finding 4 for now.
+```
+
+For the "leave it" pile, write each item where you'll see it again (a TODO list, an issue in your tracker, a note). Later, fix them together in one session: "Fix these 5 style issues: …"
+
+#### Sorting the four signup findings, in detail
 
 **Finding 1 → 🔴 Fix now.** The test file diff:
 
@@ -301,6 +328,7 @@ flowchart TD
 | "All tests pass, so it works." | Tests can be switched off or made easier. Check the test files in the diff. |
 | "`/code-review` sends my code to a human reviewer." | The reviewer is Claude Code itself, starting fresh. No person is involved. |
 | "The reviewer decides what gets fixed." | **You** decide. It only lists problems, and it can be wrong. |
+| "There's a command that sorts the findings." | You sort them yourself: is it real? does it matter? Then you tell Claude Code what to do in one message. |
 | "`/rewind` undoes everything." | It doesn't undo what terminal commands did, like installing a package. |
 
 #### Test yourself
@@ -379,13 +407,16 @@ Starting with a blank memory. The reviewer doesn't see what you asked for or why
 **Q8. What are the three piles for findings, and who decides?**
 You decide. **Fix now** (real and matters), **ask why** (you're not sure it's real), or **leave it** (real but small, fix later).
 
-**Q9. If I doubt a finding, who checks it again?**
+**Q9. How do I sort a finding into a pile?**
+Ask two questions. Is the problem real? Open the file at that line and look; if you're not sure, it goes in "ask why." If it's real, does it matter (behavior, data, tests, users)? Yes means "fix now"; no means "leave it." Then tell your Claude Code session what to do with every finding in one message.
+
+**Q10. If I doubt a finding, who checks it again?**
 Your normal Claude Code session. Copy the finding in, point to the line, and ask it to check. If the finding was right after all, move it to "fix now."
 
-**Q10. Why should I ask for proof when I ask for a fix?**
+**Q11. Why should I ask for proof when I ask for a fix?**
 "I fixed it" is just another summary. Asking it to "run the tests and show me the output" gives you evidence you can see.
 
-**Q11. (Exam angle) A team wants Claude Code to write and approve its own changes in one session to save time. What's the risk, and what do you recommend?**
+**Q12. (Exam angle) A team wants Claude Code to write and approve its own changes in one session to save time. What's the risk, and what do you recommend?**
 The session that wrote the code remembers its own reasoning and tends to confirm its own work. Problems like weakened tests or unrequested settings changes slip through. Recommend:
 - A human reads the diff.
 - A separate fresh review (`/code-review`) before the change is committed.
@@ -393,10 +424,10 @@ The session that wrote the code remembers its own reasoning and tends to confirm
 
 It's the same idea as not letting people approve their own pull requests. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q12. (Exam angle) A change passes all tests but sends live website traffic to localhost. How could the review process have caught it?**
+**Q13. (Exam angle) A change passes all tests but sends live website traffic to localhost. How could the review process have caught it?**
 Reading the diff for **changes you didn't ask for** and **typed-in values** would have shown `API_URL` changed to `"http://localhost:3000"` in `src/config.ts`. A fresh `/code-review` also flags it. Passing tests don't prove a change is right, especially if no test covers that setting. This fits the **Governance, Safety & Risk** exam domain.
 
-**Q13. (Exam angle) An engineering manager asks how to make code review with Claude Code worth the cost. How do you answer?**
+**Q14. (Exam angle) An engineering manager asks how to make code review with Claude Code worth the cost. How do you answer?**
 Match the checking to the risk:
 - Small, simple changes: a quick look at the diff only.
 - Large, sensitive, or hard-to-undo changes, and anything going to a teammate: a human reads the diff, plus `/code-review`.
