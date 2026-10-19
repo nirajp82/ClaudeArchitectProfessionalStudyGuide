@@ -54,11 +54,23 @@ Rules:
 
 **Before finishing a lesson, do a beginner read-through:** read every paragraph as someone who has never coded. For each sentence ask: *Who is doing this? Which file, and where is it? Do I know every word?* If any answer is "not sure," rewrite the sentence.
 
+### Keep it short: clear, not long
+
+Clear doesn't mean long. My other common complaint is "the whole page is too long." Aim for **250–400 lines per lesson**.
+
+- **Say each thing once.** Don't explain the same point in prose, then a table, then a diagram, then the recap, then the FAQ. Pick the one format that shows it best.
+- **One everyday comparison per main idea**, in 1–3 sentences.
+- **Don't re-teach earlier lessons.** One line plus a link: "(the context window, [lesson 2](02-how-claude-code-works.md))."
+- **Extras from the docs:** only if they matter for the exam or daily use, in 1–2 lines each.
+- **At most 2 diagrams per lesson.** Add "Things to notice" only when the point isn't obvious.
+- **Sizes:** Common mix-ups 4–6 rows. Test yourself 3–4 questions. FAQ 10–13 questions, including the exam-angle ones (see section 5). Recap one short bullet per main idea.
+- **Cut, don't pad:** if a sentence doesn't help me understand or remember, delete it.
+
 ---
 
 ## 3. How to explain: the techniques that work
 
-Use these the way lesson 2 does. Not every lesson needs all of them; pick what makes each idea click.
+Use these the way lesson 2 does. **Not every lesson needs all of them**: pick the few that make each idea click, and keep the page short (see "Keep it short" above).
 
 | Technique | What it is | Example from lesson 2 |
 |---|---|---|
@@ -66,14 +78,14 @@ Use these the way lesson 2 does. Not every lesson needs all of them; pick what m
 | **Overview table** | Before details, a table of the lesson's main parts in plain words. | "The four parts": loop, context window, tools, permissions |
 | **Everyday comparison** | Compare each big idea to something from daily life. | Loop = a mechanic. Context window = a whiteboard. Tools = a friend with a wrench vs. on the phone. Permissions = keys for a new assistant. |
 | **One running example** | Pick one realistic task and use it through the whole lesson. | "The login test is failing. Fix it." |
-| **Concrete details** | Real file names, real file contents with line numbers, the exact command, the exact output. Show exactly what happens, not "it searches" or "it sends the result." | The `my-app` folder tree, all 16 lines of `login.js`, the exact Grep result, the exact `npm test` output |
+| **Concrete details** | Real file names, real file contents with line numbers, the exact command, the exact output. Show exactly what happens, not "it searches" or "it sends the result." | The `my-app` folder tree, the buggy lines of `login.js`, the exact `npm test` output |
 | **Who's who table** | When more than one player is involved (you, Claude Code, your computer, the model, outside services, a separate AI reviewer, teammates): where each lives, what it does, an example. Put it near the top of the lesson, not buried late. | Section 5, "Who's who" |
-| **Step-by-step walkthrough** | For a process, one sub-section per step. In each, show what's asked, what happens, and what is sent or produced, using exact text. | Section 5, Rounds 1–5 |
+| **Step-by-step walkthrough** | For a process, one sub-section per step. In each, show what's asked, what happens, and what is sent or produced, using exact text. | Section 5, "The five rounds" table |
 | **"What goes where" table** | When data moves between places, list what moves and what stays. | "Sent to Anthropic's servers" vs. "Never left your computer" |
 | **🧠 Remember this** | A one or two-line memory hook in a quote block. | "Brain on the server. Hands on your computer." |
 | **Common mix-ups table** | ❌ Wrong idea vs. ✅ What really happens. | "My tests run in the cloud." → "They run on your computer." |
-| **Test yourself** | 3–5 quiz questions with answers hidden in `<details>`. | Section 5, "Test yourself" |
-| **Do / Why / Example table** | For practical advice. | "How to keep big tasks under control" |
+| **Test yourself** | 3–4 quiz questions with answers hidden in `<details>`. | Section 5, "Test yourself" |
+| **Do / Why / Example table** | For practical advice. | Lesson 8's "Which file should a rule go in?" |
 | **⚠️ Warnings** | Call out real risks with a concrete example of what goes wrong. | Turning off permission questions → deleted files |
 
 **When I ask a follow-up question about a lesson**, answer it in chat first. If I want it added, add it to the right section of that lesson, plus matching FAQ, mix-up, and test-yourself entries.
@@ -89,9 +101,9 @@ Draw diagrams in **Mermaid** (a ` ```mermaid ` code block), never as plain-text 
 | To show… | Use | Example in lesson 2 |
 |---|---|---|
 | A process or loop | `flowchart TD` | — (lesson 1's agent loop) |
-| Where things live and how they connect | `flowchart LR` with a `subgraph` per place | "The map": Your computer / Anthropic's servers / Tool servers |
-| Who sends what to whom, step by step | `sequenceDiagram`, one column per player, with `Note over` labels for each round | "The whole conversation as a timeline" |
-| How something gets filtered or narrowed down | `flowchart TD` | 1,000 files → search → 50 files → what gets sent |
+| Where things live and how they connect | `flowchart LR` with a `subgraph` per place | Lesson 6: main context window vs. subagent's context window |
+| Who sends what to whom, step by step | `sequenceDiagram`, one column per player | Section 5's five-round timeline |
+| A decision | `flowchart TD` | Lesson 6: "Compact or clear?" |
 
 - Use emoji in node labels for players: 🧑 You, 💻 Claude Code, 🗂️ Your files & terminal, ☁️ Model, 🔌 Tool servers.
 - Use `<br/>` for line breaks inside nodes.
@@ -112,10 +124,11 @@ Draw diagrams in **Mermaid** (a ` ```mermaid ` code block), never as plain-text 
 Every lesson ends with an FAQ. Lesson 2's FAQ is the model.
 
 - Format: `**Q1. Question?**` in bold, answer on the next line. Number them in order, with no gaps or letters (no "Q21a"). Renumber if you insert one.
-- **Cover every main idea in the lesson**, plus every follow-up question I asked about it.
-- Answers stand on their own: someone reading only the FAQ should understand. Plain English, short, with an example where it helps. Use a short list when an answer has several parts.
+- **10–13 questions in total**, including the exam-angle ones. Cover the main ideas and the terms most likely to confuse me, plus every follow-up question I asked about the lesson. Don't make a question for every small fact in the lesson.
+- Answers stand on their own: someone reading only the FAQ should understand. Plain English, **1–3 sentences**, with an example where it helps. Use a short list when an answer has several parts.
 - Order the questions to follow the lesson.
-- End with **2–3 `(Exam angle)` questions** that link the lesson to an exam domain, such as **Governance, Safety & Risk**. Frame them as a real scenario: "A security team asks… How do you answer?"
+- **Exam-angle questions are protected.** Never cut or shorten them when trimming a lesson; they matter most for the exam.
+- End with **3 `(Exam angle)` questions** that link the lesson to an exam domain, such as **Governance, Safety & Risk**. Frame them as a real scenario: "A security team asks… How do you answer?"
 
 ### How to word a question
 
