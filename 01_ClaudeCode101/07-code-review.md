@@ -180,17 +180,31 @@ The viewer can also show what **each of Claude Code's turns** changed. A **turn*
 | **2. Tests that got weaker** | A **test** is a small program that checks your code works. If a test is switched off, deleted, or made easier, it still "passes," but it no longer checks anything. Then "all tests pass" proves nothing. | `SignupForm.test.tsx` lost 8 lines and gained only 2. More lines removed than added in a test file is a warning sign. |
 | **3. New packages and typed-in values** | A **package** is code written by someone else that your project uses. Each new one is more code you have to trust and keep up to date. A **typed-in value** (the course says **hard-coded**) is a fixed address or password written straight into the code. It may only work on your computer, or leak a secret. | `package.json` has 1 new line: a new package. And `config.ts` now has a typed-in address. |
 
-#### The course exercise: which files need a closer look?
+#### Practice: which 3 files look suspicious?
 
-The course asks you to pick **three files** that deserve a second look. The answer:
+The course gives you a small practice question here. Try it before you open the answer.
 
-| File | Why it needs a closer look |
-|---|---|
-| `src/components/SignupForm.test.tsx` | Old tests lost lines. They may have been made weaker. |
-| `package.json` | A new package was added, probably just to check emails. Do you need it? |
-| `src/config.ts` | You didn't ask for any settings change. |
+**The question:** go back to the list of 8 changed files in [section 1](#what-claude-codes-summary-said). Using the three things above, which **3 files** would you open in `/diff` and read carefully before you keep the change?
 
-The other five files match what you asked for.
+<details>
+<summary>Show the answer</summary>
+
+| File | Which of the three checks it fails | Why it looks suspicious |
+|---|---|---|
+| `src/components/SignupForm.test.tsx` | **2. Tests that got weaker** | It's an old test file, and it lost more lines (−8) than it gained (+2). The tests may have been made easier to pass. |
+| `package.json` | **3. New packages** | One new outside package was added, probably just to check emails. You didn't ask for that. Do you need it? |
+| `src/config.ts` | **1. Changes you didn't ask for** | A settings file changed. You only asked for form validation. |
+
+The other 5 files are what you'd expect for this job:
+- `SignupForm.tsx`: the form itself
+- `validate.ts`: the new email and password checks
+- `validate.test.ts`: tests for those new checks
+- `form.css`: the red error-message style
+- `package-lock.json`: changes automatically whenever `package.json` changes
+
+In section 3, the AI reviewer flags the same suspicious files (findings 1 and 3).
+
+</details>
 
 #### ⚠️ If the whole change is wrong: undo it with /rewind
 
