@@ -35,6 +35,25 @@ Write for a **beginner**, as if explaining to a friend.
 - **No marketing words or filler.**
 - **Never make me guess what "it" or "this" means.** Name the thing.
 
+### Always answer: who, which file, where?
+
+My most common complaint is a lesson that's "not clear at all." The cause is almost always a short label the course uses that I can't picture. Lessons 7 and 8 both had to be fully rewritten for this reason.
+
+| ❌ Unclear (course shorthand) | Missing | ✅ Clear |
+|---|---|---|
+| "A reviewer can be wrong" | **Who** is the reviewer? | "The reviewer (the AI that `/code-review` starts, not a person) can be wrong" |
+| "A user file just for you" | **Which file? Where?** And "user" of what? | "A second `CLAUDE.md` in your home folder, `C:\Users\you\.claude\CLAUDE.md`. 'User' means you." |
+| "The session that wrote the code" | **Which** session? | "Your Claude Code conversation, the one that wrote the code" |
+| "Batch it for later" | Undefined course word | "Write it down and fix it later with other small problems (the course calls this *batching*)" |
+
+Rules:
+- **Every player gets named, every time.** In each step, say who does it: you, your Claude Code session, a separate AI, the model, a teammate. Use a **Who's who table** in **every** lesson that has more than one player, and put it near the top.
+- **Every file gets a full path and a folder tree.** Show where the file sits (`journal-app/CLAUDE.md`, `C:\Users\you\.claude\CLAUDE.md`), what's in it (real example content), who writes it, and who reads it.
+- **Course labels are never enough on their own.** If the course says "project file," "user file," "clean context," "reads it cold," explain what the label means in plain words the first time, and say what it does *not* mean if a beginner could misread it.
+- **Explain every tool, command, and code line in the running example**, even ones the course treats as obvious (`it.skip`, `localhost`, `pnpm`, "server actions"). I can't follow an example built on words I don't know.
+
+**Before finishing a lesson, do a beginner read-through:** read every paragraph as someone who has never coded. For each sentence ask: *Who is doing this? Which file, and where is it? Do I know every word?* If any answer is "not sure," rewrite the sentence.
+
 ---
 
 ## 3. How to explain: the techniques that work
@@ -48,7 +67,7 @@ Use these the way lesson 2 does. Not every lesson needs all of them; pick what m
 | **Everyday comparison** | Compare each big idea to something from daily life. | Loop = a mechanic. Context window = a whiteboard. Tools = a friend with a wrench vs. on the phone. Permissions = keys for a new assistant. |
 | **One running example** | Pick one realistic task and use it through the whole lesson. | "The login test is failing. Fix it." |
 | **Concrete details** | Real file names, real file contents with line numbers, the exact command, the exact output. Show exactly what happens, not "it searches" or "it sends the result." | The `my-app` folder tree, all 16 lines of `login.js`, the exact Grep result, the exact `npm test` output |
-| **Who's who table** | When more than one player is involved (you, Claude Code, your computer, the model, outside services): where each lives, what it does, an example. | Section 5, "Who's who" |
+| **Who's who table** | When more than one player is involved (you, Claude Code, your computer, the model, outside services, a separate AI reviewer, teammates): where each lives, what it does, an example. Put it near the top of the lesson, not buried late. | Section 5, "Who's who" |
 | **Step-by-step walkthrough** | For a process, one sub-section per step. In each, show what's asked, what happens, and what is sent or produced, using exact text. | Section 5, Rounds 1–5 |
 | **"What goes where" table** | When data moves between places, list what moves and what stays. | "Sent to Anthropic's servers" vs. "Never left your computer" |
 | **🧠 Remember this** | A one or two-line memory hook in a quote block. | "Brain on the server. Hands on your computer." |
